@@ -42,7 +42,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 990652751002944874, guid: cae42d0402fc9754fb54bf90c27c3361, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 747.6019
+      value: 788.8
       objectReference: {fileID: 0}
     - target: {fileID: 990652751002944874, guid: cae42d0402fc9754fb54bf90c27c3361, type: 3}
       propertyPath: m_SizeDelta.y
@@ -62,7 +62,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2219652545531999130, guid: cae42d0402fc9754fb54bf90c27c3361, type: 3}
       propertyPath: m_fontSize
-      value: 41.2
+      value: 45.45
       objectReference: {fileID: 0}
     - target: {fileID: 2702498390664980487, guid: cae42d0402fc9754fb54bf90c27c3361, type: 3}
       propertyPath: m_AnchorMax.y
@@ -102,9 +102,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4442971340802676593, guid: cae42d0402fc9754fb54bf90c27c3361, type: 3}
       propertyPath: m_text
-      value: 'Free time
-
-'
+      value: "\u0412\u0456\u043B\u044C\u043D\u0438\u0439 \u0447\u0430\u0441"
+      objectReference: {fileID: 0}
+    - target: {fileID: 4442971340802676593, guid: cae42d0402fc9754fb54bf90c27c3361, type: 3}
+      propertyPath: m_fontSize
+      value: 50.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4442971340802676593, guid: cae42d0402fc9754fb54bf90c27c3361, type: 3}
+      propertyPath: m_fontSizeMax
+      value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 4442971340802676593, guid: cae42d0402fc9754fb54bf90c27c3361, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2164040, guid: d480a32f0d772cb428658042c0b25721, type: 2}
+    - target: {fileID: 4442971340802676593, guid: cae42d0402fc9754fb54bf90c27c3361, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4569828073236388671, guid: cae42d0402fc9754fb54bf90c27c3361, type: 3}
       propertyPath: m_AnchorMax.y
@@ -124,6 +138,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4569828073236388671, guid: cae42d0402fc9754fb54bf90c27c3361, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5550598685370860331, guid: cae42d0402fc9754fb54bf90c27c3361, type: 3}
+      propertyPath: m_ChildScaleWidth
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6173147479134244074, guid: cae42d0402fc9754fb54bf90c27c3361, type: 3}
