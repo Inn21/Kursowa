@@ -6,8 +6,15 @@
   <component name="ChangeListManager">
     <list default="true" id="09104266-8a5b-45f7-a046-ee3cec23a5d0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Questagotchi/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Questagotchi/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Global/CreateTaskPopupController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Global/CreateTaskPopupController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/Free time Variant.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/Free time Variant.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/Task.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/Task.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/TasksList.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/TasksList.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/UI/UI.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/UI/UI.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Model/Task.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Model/Task.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/TasksFeature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/TasksFeature.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Global/TasksUIController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Global/TasksUIController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Tasks/FreeTimeItemController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Tasks/FreeTimeItemController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Tasks/TaskItemController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Tasks/TaskItemController.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -139,7 +146,7 @@
       <workItem from="1748188613559" duration="3673000" />
       <workItem from="1749922691883" duration="3967000" />
       <workItem from="1749979805466" duration="17538000" />
-      <workItem from="1750039621895" duration="15471000" />
+      <workItem from="1750039621895" duration="18176000" />
     </task>
     <servers />
   </component>

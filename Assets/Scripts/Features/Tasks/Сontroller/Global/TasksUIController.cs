@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Features.Tasks;
+using Core.Feature.Tasks;
+using Core.Feature.Tasks.UI;
 using Features.Tasks.Model;
-using Features.Tasks.Сontroller.Global;
+using Features.Tasks.Сontroller.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-namespace Core.Feature.Tasks.UI
+namespace Features.Tasks.Сontroller.Global
 {
     public class TasksUIController : MonoBehaviour
     {

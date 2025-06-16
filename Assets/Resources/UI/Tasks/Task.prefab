@@ -61,8 +61,17 @@ MonoBehaviour:
   _taskTitleText: {fileID: 4442971340802676593}
   _timeText: {fileID: 2219652545531999130}
   _taskIcon: {fileID: 6173147479134244074}
-  _disableOverlay: {fileID: 3060148357597273869}
   _editButton: {fileID: 741575623190129649}
+  _defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  _inProgressColor: {r: 0.9812607, g: 0.99607843, b: 0.6972549, a: 1}
+  _awaitingColor: {r: 0.6972549, g: 0.96644306, b: 0.99607843, a: 1}
+  _completedColor: {r: 0.63411766, g: 0.90588236, b: 0.78552943, a: 1}
+  _failedColor: {r: 1, g: 0.7, b: 0.7, a: 1}
+  _baseRect: {fileID: 3146321855165316600}
+  _rightSwipeVisual: {fileID: 5415634917561550069}
+  _leftSwipeVisual: {fileID: 8426857876628280971}
+  _swipeThreshold: 200
+  _baseBackground: {fileID: 561180766516387060}
 --- !u!1 &1972487728997643179
 GameObject:
   m_ObjectHideFlags: 0
@@ -566,6 +575,7 @@ GameObject:
   - component: {fileID: 2129677019525436082}
   - component: {fileID: 3573831421770757268}
   - component: {fileID: 5848886474038515223}
+  - component: {fileID: 7702382984220384802}
   m_Layer: 5
   m_Name: Right Swipe
   m_TagString: Untagged
@@ -631,6 +641,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 3
+--- !u!225 &7702382984220384802
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5415634917561550069}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &6679129455845253169
 GameObject:
   m_ObjectHideFlags: 0
@@ -1154,6 +1176,7 @@ GameObject:
   - component: {fileID: 4201219946500941629}
   - component: {fileID: 2583561967401101525}
   - component: {fileID: 2118553446505992508}
+  - component: {fileID: 8396699652274405812}
   m_Layer: 5
   m_Name: LeftSwilpe
   m_TagString: Untagged
@@ -1219,6 +1242,18 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 3
+--- !u!225 &8396699652274405812
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8426857876628280971}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &8642555848522187143
 GameObject:
   m_ObjectHideFlags: 0

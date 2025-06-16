@@ -9,6 +9,7 @@ namespace Features.Tasks.Model
     {
         Pending,
         InProgress,
+        AwaitingConfirmation,
         Completed,
         Failed
     }
@@ -108,6 +109,12 @@ namespace Features.Tasks.Model
         {
             if (TodayStatus != TaskStatus.Pending) return;
             TodayStatus = TaskStatus.InProgress;
+        }
+        
+        public void SetAwaitingConfirmation()
+        {
+            if (TodayStatus == TaskStatus.InProgress)
+                TodayStatus = TaskStatus.AwaitingConfirmation;
         }
 
         public void Complete()
