@@ -11,6 +11,7 @@ namespace Core.Feature.Tasks.UI
     public class TaskItemController : MonoBehaviour
     {
         [Inject] TasksFeature _tasksFeature;
+        [Inject] TaskTypeFeature _taskTypeFeature;
         
         [Header("Основні елементи")]
         [SerializeField] private TextMeshProUGUI _taskTitleText;
@@ -37,6 +38,17 @@ namespace Core.Feature.Tasks.UI
             var endTime = _task.Data.EndTimeOfDay.ToString(@"hh\:mm");
             var durationMinutes = _task.Data.Duration.TotalMinutes.ToString("F0");
             _timeText.text = $"{startTime} - {endTime} ({durationMinutes} хв)";
+            
+            var definition = _taskTypeFeature.GetDefinition(_task.Data.Type);
+            if(definition != null && definition.Icon != null)
+            {
+                _taskIcon.sprite = definition.Icon;
+                _taskIcon.color = Color.white;
+            }
+            else
+            {
+                _taskIcon.color = Color.clear;
+            }
 
             bool isRealTask = !_task.Data.IsFreeTime;
             _editButton.gameObject.SetActive(isRealTask);

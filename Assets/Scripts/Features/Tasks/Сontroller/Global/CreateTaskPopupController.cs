@@ -63,6 +63,7 @@ namespace Core.Feature.Tasks.UI
             var typeDefinitions = _taskTypeFeature.GetAllTaskTypes();
             var options = typeDefinitions.Select(def => new TMP_Dropdown.OptionData(def.Name)).ToList();
             _taskTypeDropdown.AddOptions(options);
+            
         }
 
         public void Show(DayOfWeek day, TimeSpan startTime, TimeSpan endTime, TasksUIController owner, TaskData taskToEdit = null)

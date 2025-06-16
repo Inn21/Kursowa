@@ -55,9 +55,7 @@ namespace Features.Tasks.Model
         public string Name;
         public TaskType Type;
         
-        
         public Color TaskColor;
-        
         
         public bool IsFreeTime;
 
