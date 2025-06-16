@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using _PROJECT.Scripts.Core.Utils.MonoUtils;
 using Core.Feature;
+using Core.Feature.PlayerStats;
 using Core.Feature.Tasks;
 using Core.Installers;
 using Core.Utils.MonoUtils;
@@ -53,6 +54,7 @@ namespace _PROJECT.Scripts.Core.Client
         #region Features
         
         TasksFeature _tasksFeature;
+        PlayerStatsFeature _playerStatsFeature;
         
         #endregion
 
@@ -95,9 +97,11 @@ namespace _PROJECT.Scripts.Core.Client
         private void FeatureBindings()
         {
             _tasksFeature = new TasksFeature();
+            _playerStatsFeature = new PlayerStatsFeature();
             var features = new List<BaseFeature>
             {
-                _tasksFeature
+                _tasksFeature,
+                _playerStatsFeature
             };
 
             FeatureInstaller.Install(Container, features);
@@ -121,6 +125,7 @@ namespace _PROJECT.Scripts.Core.Client
         private void InitInitializableFeatures()
         {
             _tasksFeature.Initialize();
+            _playerStatsFeature.Initialize();
         }
 
         #endregion
