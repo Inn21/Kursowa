@@ -11,24 +11,24 @@ namespace Core.Feature.Tasks
 {
     public class TasksFeature : BaseFeature
     {
-       
+
         [Inject] readonly ISaveFeature _saveFeature;
         [Inject] readonly MonoFeature _monoFeature;
 
-        
+
         public event Action OnTaskListUpdated;
         public event Action<Task> OnTaskStarted;
         public event Action<Task> OnTaskCompleted;
         public event Action<Task> OnTaskFailed;
-        
-        
+
+
         private List<TaskData> _taskTemplates = new List<TaskData>();
         private readonly Dictionary<DayOfWeek, List<Task>> _weeklyTasks = new Dictionary<DayOfWeek, List<Task>>();
         private Task _currentTrackedTask;
         private DateTime _lastCheckTime = DateTime.MinValue;
 
-        private const string SAVE_KEY = "WeeklyTasksData";
-        
+        private const string SAVE_KEY = "WeeklyTasks";
+
         public void Initialize()
         {
             LoadTasks();
@@ -44,7 +44,7 @@ namespace Core.Feature.Tasks
 
         #region Public API - Методи для керування завданнями
 
-      public List<Task> GetTasksForDay(DayOfWeek day)
+        public List<Task> GetTasksForDay(DayOfWeek day)
         {
             var timeline = new List<Task>();
             var realTasksForDay = _taskTemplates
@@ -53,12 +53,12 @@ namespace Core.Feature.Tasks
                 .ToList();
 
             var currentTime = TimeSpan.Zero;
-            
+
             foreach (var taskData in realTasksForDay)
             {
                 var gap = taskData.StartTimeOfDay - currentTime;
-                
-               
+
+
                 if (gap >= TimeSpan.FromMinutes(1))
                 {
                     timeline.Add(CreateFreeTimeSlot(currentTime, gap));
@@ -74,7 +74,7 @@ namespace Core.Feature.Tasks
                 var finalGap = endOfDay - currentTime;
                 if (finalGap >= TimeSpan.FromMinutes(1))
                 {
-                     timeline.Add(CreateFreeTimeSlot(currentTime, finalGap));
+                    timeline.Add(CreateFreeTimeSlot(currentTime, finalGap));
                 }
             }
 
@@ -83,19 +83,46 @@ namespace Core.Feature.Tasks
 
         public bool AddTask(TaskData newTaskData)
         {
-            if (!IsTimeSlotAvailable(newTaskData.RecurrenceDays.First(), newTaskData.StartTimeOfDay, newTaskData.EndTimeOfDay, null))
+            if (!IsTimeSlotAvailable(newTaskData.RecurrenceDays.First(), newTaskData.StartTimeOfDay,
+                    newTaskData.EndTimeOfDay, null))
             {
                 Debug.LogWarning("Time slot is not available!");
                 return false;
             }
-            
+
             _taskTemplates.Add(newTaskData);
-            
+
             OnTaskListUpdated?.Invoke();
             return true;
         }
-
         
+        public bool UpdateTask(TaskData updatedTaskData)
+        {
+            if (!IsTimeSlotAvailable(updatedTaskData.RecurrenceDays.First(), updatedTaskData.StartTimeOfDay, updatedTaskData.EndTimeOfDay, updatedTaskData.Id))
+            {
+                Debug.LogWarning("Updated time slot is not available!");
+                return false;
+            }
+
+            var taskIndex = _taskTemplates.FindIndex(t => t.Id == updatedTaskData.Id);
+            if (taskIndex != -1)
+            {
+                _taskTemplates[taskIndex] = updatedTaskData;
+                OnTaskListUpdated?.Invoke();
+                return true;
+            }
+            return false;
+        }
+
+        public void RemoveTask(string taskId)
+        {
+            var itemsRemoved = _taskTemplates.RemoveAll(t => t.Id == taskId);
+            if (itemsRemoved > 0)
+            {
+                OnTaskListUpdated?.Invoke();
+            }
+        }
+
         public bool IsTimeSlotAvailable(DayOfWeek day, TimeSpan start, TimeSpan end, string excludeTaskId)
         {
             var realTasksForDay = _taskTemplates
@@ -108,6 +135,7 @@ namespace Core.Feature.Tasks
                     return false;
                 }
             }
+
             return true;
         }
 
@@ -122,32 +150,34 @@ namespace Core.Feature.Tasks
             };
             return new Task(freeTimeData);
         }
+
         #endregion
 
         #region Core Logic - Основна логіка роботи фічі
 
-        
+
         private void TrackTasks(float deltaTime)
         {
             var now = DateTime.Now;
-            
-            
+
+
             if (now.Date != _lastCheckTime.Date)
             {
-                RegenerateWeeklyTasks(); 
+                RegenerateWeeklyTasks();
             }
+
             _lastCheckTime = now;
 
             var today = now.DayOfWeek;
             if (!_weeklyTasks.ContainsKey(today)) return;
 
             var tasksForToday = _weeklyTasks[today];
-            
+
             foreach (var task in tasksForToday)
             {
                 var taskStartTime = now.Date + task.Data.StartTimeOfDay;
-                var taskEndTime =  now.Date + task.Data.EndTimeOfDay;
-                
+                var taskEndTime = now.Date + task.Data.EndTimeOfDay;
+
                 // Перевірка на початок завдання
                 if (task.TodayStatus == TaskStatus.Pending && now >= taskStartTime && now < taskEndTime)
                 {
@@ -155,15 +185,15 @@ namespace Core.Feature.Tasks
                     _currentTrackedTask = task;
                     OnTaskStarted?.Invoke(task);
                 }
-                
+
                 else if (task.TodayStatus == TaskStatus.InProgress && now >= taskEndTime)
                 {
-                    
+
                 }
             }
         }
 
-       
+
         private void RegenerateWeeklyTasks()
         {
             _weeklyTasks.Clear();
@@ -183,14 +213,14 @@ namespace Core.Feature.Tasks
                     _weeklyTasks[day].Add(newTask);
                 }
             }
-            
-            
+
+
             foreach (var dayTasks in _weeklyTasks.Values)
             {
                 dayTasks.Sort((a, b) => a.Data.StartTimeOfDay.CompareTo(b.Data.StartTimeOfDay));
             }
 
-            OnTaskListUpdated?.Invoke(); 
+            OnTaskListUpdated?.Invoke();
         }
 
         #endregion
@@ -199,30 +229,37 @@ namespace Core.Feature.Tasks
 
         private void SaveTasks()
         {
-            
             foreach (var template in _taskTemplates)
             {
                 template.PrepareForSerialization();
             }
-            
+
             var wrapper = new TaskDataWrapper { TaskTemplates = _taskTemplates };
-            _saveFeature.Save(wrapper, SAVE_KEY);
+            string json = JsonUtility.ToJson(wrapper);
+
+            _saveFeature.Save(json, SAVE_KEY);
             Debug.Log("Tasks saved successfully!");
         }
 
         private void LoadTasks()
         {
-            var wrapper = _saveFeature.Load(SAVE_KEY, new TaskDataWrapper());
+            string json = _saveFeature.Load(SAVE_KEY, "{}");
+            TaskDataWrapper wrapper = JsonUtility.FromJson<TaskDataWrapper>(json);
+
             if (wrapper != null && wrapper.TaskTemplates != null)
             {
                 _taskTemplates = wrapper.TaskTemplates;
+                foreach (var template in _taskTemplates)
+                {
+                    template.RestoreTimeSpans();
+                }
             }
             else
             {
                 _taskTemplates = new List<TaskData>();
             }
 
-            RegenerateWeeklyTasks();
+            OnTaskListUpdated?.Invoke();
             Debug.Log("Tasks loaded!");
         }
 

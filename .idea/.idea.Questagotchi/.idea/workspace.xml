@@ -5,67 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="09104266-8a5b-45f7-a046-ee3cec23a5d0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/NewTaskForm.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/NewTaskForm.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/StartTime.prefab" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/StartTime.prefab.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Core/Feature/Save.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/Editor.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/Editor/DeleteSavesEditor.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/Editor/DeleteSavesEditor.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/ISaveFeature.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/ISaveFeature.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/JsonSaveFeature.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/JsonSaveFeature.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/PlayerPrefsSaveFeature.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/PlayerPrefsSaveFeature.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/SaveData.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/SaveData.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/SaveFileVariant.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/SaveFileVariant.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/SerializableDictionary.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Save/SerializableDictionary.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Task.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Task.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/TaskDataWrapper.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/TaskDataWrapper.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/TasksFeature.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/TasksFeature.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Global.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Global/CreateTaskPopupController.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Global/CreateTaskPopupController.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Global/TasksUIController.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Global/TasksUIController.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Tasks.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Tasks/FreeTimeItemController.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Tasks/FreeTimeItemController.cs.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Tasks/TaskItemController.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Tasks/TaskItemController.cs.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Questagotchi/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Questagotchi/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/Free time Variant.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/Free time Variant.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/Task.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/Task.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/TasksList.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/UI/Tasks/TasksList.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/UI/UI.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/UI/UI.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/MainScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/MainScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Core/Client/Client.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Core/Client/Client.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Core/Client/Client.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Core/Client/Client.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Core/Controller/BaseControllerConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Core/Controller/BaseControllerConfig.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Core/Feature/BaseFeature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Core/Feature/BaseFeature.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Core/Installers/CoreFeatureInstaller.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Core/Installers/CoreFeatureInstaller.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Core/Installers/FeatureInstaller.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Core/Installers/FeatureInstaller.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Core/InstanceGenerator/DiInstanceGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Core/InstanceGenerator/DiInstanceGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Core/Utils/Extensions/StringExtension.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Core/Utils/Extensions/StringExtension.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Core/Utils/FuncExpressions/ExpressionUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Core/Utils/FuncExpressions/ExpressionUtils.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Core/Utils/MonoUtils/MonoFeature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Core/Utils/MonoUtils/MonoFeature.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Core/Utils/TimeUtils/TimeUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Core/Utils/TimeUtils/TimeUtils.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/TaskModel.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/TaskModel.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Ui/RuntimeUIFeature.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Ui/RuntimeUIFeature.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/LiberationSans SDF - Metalic Green.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/LiberationSans SDF - Metalic Green.mat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Test.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Test.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/TasksFeature.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/TasksFeature.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Global/CreateTaskPopupController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Global/CreateTaskPopupController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Global/TasksUIController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Global/TasksUIController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Tasks/TaskItemController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Features/Tasks/Сontroller/Tasks/TaskItemController.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,10 +30,11 @@
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Core/Installers/CoreFeatureInstaller.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Core/Installers/DiInstanceGeneratorInstaller.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Core/Installers/FeatureInstaller.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Features/Ui/RuntimeUIFeature.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1fd52158108c4fe3a6817b50854eb75e46ac00/80/ab8f6d2d/List`1.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/1fd52158108c4fe3a6817b50854eb75e46ac00/cd/f74e5407/Object.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/5a41d6b7189842eca409fd0b1c3e3dcf17bf78/3b/3e87d9c9/DayOfWeek.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -186,13 +131,14 @@
       <workItem from="1748188613559" duration="3673000" />
       <workItem from="1749922691883" duration="3967000" />
       <workItem from="1749979805466" duration="17538000" />
-      <workItem from="1750039621895" duration="5260000" />
+      <workItem from="1750039621895" duration="6575000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="true" />
   <component name="UnityProjectDiscoverer">
     <option name="hasUnityReference" value="true" />

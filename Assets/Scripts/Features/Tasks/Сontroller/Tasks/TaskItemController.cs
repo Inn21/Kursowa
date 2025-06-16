@@ -16,28 +16,46 @@ namespace Core.Feature.Tasks.UI
         [SerializeField] private TextMeshProUGUI _timeText;
         [SerializeField] private Image _taskIcon; 
         [SerializeField] private GameObject _disableOverlay; 
+        [SerializeField] private Button _editButton;
         
         // TODO: Додати логіку для відображення нагород (Stats)
 
         private Task _task;
+        private TasksUIController _ownerController;
 
+        
        
-        public void Initialize(Task task)
+        public void Initialize(Task task, TasksUIController owner)
         {
             _task = task;
+            _ownerController = owner;
 
-           
             _taskTitleText.text = _task.Data.Name;
             
-           
             var startTime = _task.Data.StartTimeOfDay.ToString(@"hh\:mm");
-            var endTime = _task.Data.EndTimeOfDay.ToString(@"hh\:mm") ?? "N/A";
-            var durationMinutes = _task.Data.Duration.TotalMinutes.ToString("F0") ?? "0";
+            var endTime = _task.Data.EndTimeOfDay.ToString(@"hh\:mm");
+            var durationMinutes = _task.Data.Duration.TotalMinutes.ToString("F0");
             _timeText.text = $"{startTime} - {endTime} ({durationMinutes} хв)";
-            
-            // TODO: Встановити іконку _taskIcon на основі _task.Data.Type
 
-            UpdateVisualState();
+            bool isRealTask = !_task.Data.IsFreeTime;
+            _editButton.gameObject.SetActive(isRealTask);
+            if(isRealTask)
+            {
+                _editButton.onClick.AddListener(OnEditClicked);
+            }
+        }
+
+        private void OnEditClicked()
+        {
+            _ownerController.ShowEditPopup(_task.Data);
+        }
+
+        private void OnDestroy()
+        {
+            if (_editButton != null)
+            {
+                _editButton.onClick.RemoveListener(OnEditClicked);
+            }
         }
 
         private void OnEnable()
@@ -54,6 +72,8 @@ namespace Core.Feature.Tasks.UI
             _tasksFeature.OnTaskFailed -= HandleTaskStateChanged;
             _tasksFeature.OnTaskStarted -= HandleTaskStateChanged;
         }
+        
+        
         
         private void HandleTaskStateChanged(Task updatedTask)
         {

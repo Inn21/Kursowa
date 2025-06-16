@@ -59,7 +59,12 @@ namespace Core.Feature.Tasks.UI
         
         public void ShowCreationPopup(DayOfWeek day, TimeSpan startTime, TimeSpan endTime)
         {
-            _createTaskPopup.Show(day, startTime, endTime);
+            _createTaskPopup.Show(day, startTime, endTime,this);
+        }
+        public void ShowEditPopup(TaskData taskData)
+        {
+            var day = taskData.RecurrenceDays.First();
+            _createTaskPopup.Show(day, TimeSpan.Zero, TimeSpan.FromHours(24), this, taskData);
         }
         
         private void SelectDay(DayOfWeek day)
@@ -98,7 +103,7 @@ namespace Core.Feature.Tasks.UI
                 else
                 {
                     var controller = newItemObject.GetComponent<TaskItemController>();
-                    controller.Initialize(task);
+                    controller.Initialize(task, this);
                 }
                 _spawnedTaskItems.Add(newItemObject);
             }

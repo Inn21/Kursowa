@@ -16,7 +16,8 @@ namespace Core.Feature.Tasks.UI
         [SerializeField] private TMP_Text _errorText;
         [SerializeField] private Button _createButton;
         [SerializeField] private Button _closeButton;
-        
+        [SerializeField] private Button _deleteButton;
+
         [Header("Час Початку")]
         [SerializeField] private Slider _startHourSlider;
         [SerializeField] private Slider _startMinuteSlider;
@@ -33,6 +34,9 @@ namespace Core.Feature.Tasks.UI
         [Inject] private TasksFeature _tasksFeature;
         private Color _selectedColor;
         private DayOfWeek _currentDay;
+        private TasksUIController _ownerController;
+        private bool _isEditMode;
+        private string _editingTaskId;
 
         private TimeSpan _slotBoundaryStart;
         private TimeSpan _slotBoundaryEnd;
@@ -42,18 +46,53 @@ namespace Core.Feature.Tasks.UI
 
         private void Awake()
         {
-            _createButton.onClick.AddListener(OnCreateClicked);
+            _createButton.onClick.AddListener(OnCreateOrUpdateClicked);
             _closeButton.onClick.AddListener(Hide);
-
-            for (int i = 0; i < _colorButtons.Count; i++)
-            {
-                var button = _colorButtons[i];
-                button.onClick.AddListener(() => SelectColor(button.GetComponent<Image>().color));
-            }
-            
-            _popupRoot.SetActive(false);
+            _deleteButton.onClick.AddListener(OnDeleteClicked);
         }
 
+        public void Show(DayOfWeek day, TimeSpan startTime, TimeSpan endTime, TasksUIController owner, TaskData taskToEdit = null)
+        {
+            _isEditMode = taskToEdit != null;
+            _editingTaskId = _isEditMode ? taskToEdit.Id : null;
+            _ownerController = owner;
+            _currentDay = day;
+            _taskNameInput.text = "";
+            SelectColor(_colorButtons.Count > 0 ? _colorButtons[0].GetComponent<Image>().color : Color.white);
+            
+            _slotBoundaryStart = startTime;
+            _slotBoundaryEnd = endTime;
+            
+            _deleteButton.gameObject.SetActive(_isEditMode);
+
+            TimeSpan initialStartTime = _isEditMode ? taskToEdit.StartTimeOfDay : startTime;
+            TimeSpan initialEndTime = _isEditMode ? taskToEdit.EndTimeOfDay : endTime;
+
+            if(_isEditMode)
+            {
+                 _taskNameInput.text = taskToEdit.Name;
+                 SelectColor(taskToEdit.TaskColor);
+            }
+
+            _startHourSlider.value = initialStartTime.Hours;
+            _startMinuteSlider.value = initialStartTime.Minutes;
+            
+            if (initialEndTime.TotalHours >= 24)
+            {
+                _endHourSlider.value = 23;
+                _endMinuteSlider.value = 59;
+            }
+            else
+            {
+                _endHourSlider.value = initialEndTime.Hours;
+                _endMinuteSlider.value = initialEndTime.Minutes;
+            }
+
+            SubscribeSliders();
+            ValidateAndCacheAll();
+            _popupRoot.SetActive(true);
+        }
+        
         public void SubscribeSliders()
         {
             _startHourSlider.onValueChanged.AddListener(_ => OnStartTimeChanged());
@@ -70,90 +109,45 @@ namespace Core.Feature.Tasks.UI
             _endMinuteSlider.onValueChanged.RemoveAllListeners();
         }
 
-        public void Show(DayOfWeek day, TimeSpan startTime, TimeSpan endTime)
-        {
-            
-            _currentDay = day;
-            _taskNameInput.text = "";
-            SelectColor(_colorButtons.Count > 0 ? _colorButtons[0].GetComponent<Image>().color : Color.white);
-            
-            _slotBoundaryStart = startTime;
-            _slotBoundaryEnd = endTime;
-
-            _startHourSlider.value = startTime.Hours;
-            _startMinuteSlider.value = startTime.Minutes;
-            
-            SubscribeSliders();
-            
-            if (endTime.TotalHours >= 24)
-            {
-                _endHourSlider.value = 23;
-                _endMinuteSlider.value = 59;
-            }
-            else
-            {
-                _endHourSlider.value = endTime.Hours;
-                _endMinuteSlider.value = endTime.Minutes;
-            }
-
-            ValidateAndCacheAll();
-            
-            _popupRoot.SetActive(true);
-        }
-
         public void Hide()
         {
             UnsubscribeSliders();
             _popupRoot.SetActive(false);
         }
 
-        #region Time Changed Handlers
-
         private void OnStartTimeChanged()
         {
             if (_isUpdating) return;
-
             var newStartTime = GetCurrentStartTime();
             var endTime = GetCurrentEndTime();
 
-            
             if (newStartTime < _slotBoundaryStart)
             {
-                
                 SetStartTime(_slotBoundaryStart);
-                newStartTime = _slotBoundaryStart;
             }
             else if (newStartTime >= endTime)
             {
-                
                 RevertStartTime();
                 return;
             }
-            
             ValidateAndCacheAll();
         }
 
         private void OnEndTimeChanged()
         {
             if (_isUpdating) return;
-
             var startTime = GetCurrentStartTime();
             var newEndTime = GetCurrentEndTime();
 
-            
             if (newEndTime > _slotBoundaryEnd)
             {
-               
                 SetEndTime(_slotBoundaryEnd);
-                newEndTime = GetCurrentEndTime(); 
             }
             else if (newEndTime <= startTime)
             {
-                
                 RevertEndTime();
                 return;
             }
-            
             ValidateAndCacheAll();
         }
 
@@ -162,7 +156,7 @@ namespace Core.Feature.Tasks.UI
             var startTime = GetCurrentStartTime();
             var endTime = GetCurrentEndTime();
             
-            bool isAvailable = _tasksFeature.IsTimeSlotAvailable(_currentDay, startTime, endTime, null);
+            bool isAvailable = _tasksFeature.IsTimeSlotAvailable(_currentDay, startTime, endTime, _editingTaskId);
             _createButton.interactable = isAvailable;
             _errorText.gameObject.SetActive(!isAvailable);
             _errorText.text = isAvailable ? "" : "Час перетинається з іншим завданням!";
@@ -171,11 +165,7 @@ namespace Core.Feature.Tasks.UI
             CacheLastValidTime();
         }
 
-        #endregion
-
-        #region Actions and Helpers
-        
-        private void OnCreateClicked()
+        private void OnCreateOrUpdateClicked()
         {
             if (string.IsNullOrWhiteSpace(_taskNameInput.text))
             {
@@ -187,17 +177,29 @@ namespace Core.Feature.Tasks.UI
             var startTime = GetCurrentStartTime();
             var endTime = GetCurrentEndTime();
 
-            var newTaskData = new TaskData
+            var taskData = new TaskData
             {
+                Id = _editingTaskId ?? Guid.NewGuid().ToString(),
                 Name = _taskNameInput.text,
                 TaskColor = _selectedColor,
                 StartTimeOfDay = startTime,
                 Duration = endTime - startTime,
                 RecurrenceDays = new List<DayOfWeek> { _currentDay }
             };
+
+            bool success = _isEditMode ? _tasksFeature.UpdateTask(taskData) : _tasksFeature.AddTask(taskData);
             
-            if (_tasksFeature.AddTask(newTaskData))
+            if (success)
             {
+                Hide();
+            }
+        }
+
+        private void OnDeleteClicked()
+        {
+            if (_isEditMode)
+            {
+                _tasksFeature.RemoveTask(_editingTaskId);
                 Hide();
             }
         }
@@ -234,7 +236,6 @@ namespace Core.Feature.Tasks.UI
             _isUpdating = false;
         }
 
-
         private void UpdateUIText(TimeSpan start, TimeSpan end)
         {
             _startTimeText.text = start.ToString(@"hh\:mm");
@@ -264,7 +265,5 @@ namespace Core.Feature.Tasks.UI
             _endMinuteSlider.value = _lastValidEndMinute;
             _isUpdating = false;
         }
-
-        #endregion
     }
 }
