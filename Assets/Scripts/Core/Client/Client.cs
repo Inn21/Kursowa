@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using _PROJECT.Scripts.Core.Utils.MonoUtils;
 using Core.Feature;
+using Core.Feature.Tasks;
 using Core.Installers;
 using Core.Utils.MonoUtils;
-using Features.Ui;
 using UnityEngine;
 using Zenject;
 
@@ -47,12 +47,13 @@ namespace _PROJECT.Scripts.Core.Client
         }
 
         #region CoreFeatures
-
         private MonoFeature _monoService;
-        private RuntimeUIFeature _runtimeUIFeature;
         #endregion
 
         #region Features
+        
+        TasksFeature _tasksFeature;
+        
         #endregion
 
         #region Bindings
@@ -69,7 +70,7 @@ namespace _PROJECT.Scripts.Core.Client
             InjectorDiBindings();
             CoreFeatureBindings();
             FeatureBindings();
-            //TODO: Add here other installers, maybe for services, divide features by core and the ones that depend on them, etc.
+            
 
             _bindingsInitialized = true;
         }
@@ -82,17 +83,10 @@ namespace _PROJECT.Scripts.Core.Client
         private void CoreFeatureBindings()
         {
             _monoService = new MonoFeature();
-            _runtimeUIFeature = new RuntimeUIFeature();
-
-
-            // var sceneConfig = Resources.Load<SceneFeatureConfig>("SceneConfig");
-            // _sceneFeature.Initialize(sceneConfig);
             
-
             var coreFeatures = new List<BaseFeature>
             {
                 _monoService,
-                _runtimeUIFeature,
             };
 
             CoreFeatureInstaller.Install(Container, coreFeatures);
@@ -100,9 +94,10 @@ namespace _PROJECT.Scripts.Core.Client
 
         private void FeatureBindings()
         {
-
+            _tasksFeature = new TasksFeature();
             var features = new List<BaseFeature>
             {
+                _tasksFeature
             };
 
             FeatureInstaller.Install(Container, features);
@@ -121,20 +116,11 @@ namespace _PROJECT.Scripts.Core.Client
         private void InitInitializableCoreFeatures()
         {
             _monoService.Initialize();
-            _runtimeUIFeature.Initialize();
         }
 
         private void InitInitializableFeatures()
         {
-        }
-
-        private void AddLoadingScreen()
-        {
-        }
-
-        private void OnDestroy()
-        {
-            // _sceneFeature.OnSceneLoaded -= AddLoadingScreen;
+            _tasksFeature.Initialize();
         }
 
         #endregion

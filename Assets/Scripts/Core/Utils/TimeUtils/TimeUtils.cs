@@ -52,22 +52,16 @@ namespace Engine.Core.Utils.TimeUtils
 
         public static void GetNetworkUtc(Action<DateTime> onComplete)
         {
-            // NTP (Network Time Protocol) is a networking protocol for clock synchronization
-            // between computer systems over packet-switched, variable-latency data networks.
-            // In operation since before 1985, NTP is one of the oldest Internet protocols in current use.
-            // NTP was designed by David L. Mills of the University of Delaware.
-            // NTP uses an epoch of January 1, 1900
-
-            // Get the NTP server's IP address
+            
             var ntpServerIpAddress = "time.windows.com";
 
-            // Create the NTP request message
+            
             var ntpData = new byte[48];
             ntpData[0] = 0x1B;
 
             try
             {
-                // Send the NTP request and receive the response
+                
                 using (var udpClient = new UdpClient(ntpServerIpAddress, 123))
                 {
                     udpClient.Send(ntpData, ntpData.Length);
@@ -84,7 +78,7 @@ namespace Engine.Core.Utils.TimeUtils
             }
         }
 
-        // Get the NTP receive timestamp from the NTP response data
+       
         private static DateTime GetNtpReceiveTimestamp(byte[] ntpData)
         {
             const int ntpDataOffset = 40;

@@ -5,7 +5,6 @@ namespace Core.Feature
 {
     public class BaseFeature : IDisposable
     {
-        //TODO: Add here Services that are the most used ones (??)
         public virtual void Dispose()
         {
         }

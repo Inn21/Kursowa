@@ -25,7 +25,7 @@ namespace _PROJECT.Scripts.Core.InstanceGenerator
             return (TClass)_container.Instantiate(typeof(TClass), extraArgs);
         }
 
-        //Instantiate the given prefab and then inject into any MonoBehaviour's that are on it
+        
         public GameObject CreatePrefabInstance<TPrefab>(TPrefab prefab) where TPrefab : Object
         {
             return _container.InstantiatePrefab(prefab);
@@ -40,13 +40,13 @@ namespace _PROJECT.Scripts.Core.InstanceGenerator
             return _container.InstantiatePrefab(prefab, position, rotation, parent);
         }
 
-        //Same as InstantiatePrefab except instead of passing a prefab, you pass a path within the unity Resources folder where the prefab exists
+       
         public GameObject CreatePrefabInstance(string path)
         {
             return _container.InstantiatePrefabResource(path);
         }
 
-        //Instantiates the given prefab, injects on the prefab, and then returns the given component which is assumed to exist somewhere in the hierarchy of the prefab
+        
         public TComponent CreatePrefabForComponentInstance<TComponent>(GameObject go) where TComponent : MonoBehaviour
         {
             return _container.InstantiatePrefabForComponent<TComponent>(go);
@@ -58,7 +58,7 @@ namespace _PROJECT.Scripts.Core.InstanceGenerator
             return _container.InstantiatePrefabForComponent<TComponent>(go, extraArgs);
         }
 
-        //Same as InstantiatePrefabForComponent, except the prefab is provided as a resource path instead of as a direct reference
+       
         public TComponent CreatePrefabForComponentInstance<TComponent>(string path) where TComponent : MonoBehaviour
         {
             return _container.InstantiatePrefabResourceForComponent<TComponent>(path);
@@ -70,7 +70,7 @@ namespace _PROJECT.Scripts.Core.InstanceGenerator
             return _container.InstantiatePrefabResourceForComponent<TComponent>(path, extraArgs);
         }
 
-        //Add the given component to a given game object.
+        
         public TComponent CreateComponentInstance<TComponent>(GameObject go) where TComponent : Component
         {
             return _container.InstantiateComponent<TComponent>(go);

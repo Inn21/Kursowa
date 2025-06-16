@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using _PROJECT.Scripts.Application.Features.Save;
 using Core.Feature;
 using Zenject;
 
@@ -15,7 +16,7 @@ namespace Core.Installers
 
         public override void InstallBindings()
         {
-            // Container.Bind<ISaveFeature>().To<JsonSaveFeature>().AsSingle();
+            Container.Bind<ISaveFeature>().To<JsonSaveFeature>().AsSingle();
             foreach (var feature in _features)
             {
                 Container.BindInterfacesAndSelfTo(feature.GetType())

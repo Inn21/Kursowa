@@ -64,23 +64,23 @@ namespace Engine.Core.Utils.Extensions
 
             for (var i = 0; i < input.Length; i++)
             {
-                // Push everything in the stack
+                
                 stack.Push(input[i]);
                 foreach (var subString in subStrings)
-                    // Only compare with substring if stack length is equal or grater than substring
+                    
                     if (stack.Count >= subString.Length)
                     {
-                        // Temp substring to keep track of popped elements
+                        
                         var temp = string.Empty;
                         for (var j = subString.Length - 1; j >= 0; j--)
                             if (stack.Peek() == subString[j])
                             {
-                                // If match then pop and keep that in temp
+                                
                                 temp = stack.Pop() + temp;
                             }
                             else
                             {
-                                // If not matched then re insert any popped chars in stack
+                                
                                 foreach (var c in temp) stack.Push(c);
                                 break;
                             }

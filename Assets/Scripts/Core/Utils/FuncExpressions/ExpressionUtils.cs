@@ -22,7 +22,7 @@ namespace Engine.Core.Utils.FuncExpressions
             }
             catch
             {
-                // Debug.LogException(e);
+                
             }
 
             return body;
@@ -31,7 +31,6 @@ namespace Engine.Core.Utils.FuncExpressions
         public static string GetBeautifiedExpression<T>(Expression<Func<T>> exp)
         {
             var expression = exp.ToString();
-            // Beautify expression for display...
             expression = expression.Substring(expression.LastIndexOf('.'));
             if (expression.EndsWith(")")) expression = expression.Substring(0, expression.Length - 1);
 

@@ -15,7 +15,7 @@ namespace Core.Utils.MonoUtils
 {
     public class MonoFeature : BaseFeature
     {
-        private const int SlowUpdateRate = 10; // TODO: Add to config when ServiceConfig created
+        private const int SlowUpdateRate = 10; 
 
         private readonly float _unscaledFixedTimeStep = 0.1f;
 
@@ -118,7 +118,7 @@ namespace Core.Utils.MonoUtils
             _slowUpdateTimeSum += deltaTime;
             _slowUpdateFrameCount++;
 
-            // Check if enough frames passed for the next slow update
+           
             if (_slowUpdateFrameCount < SlowUpdateRate) return;
 
             OnSlowUpdate?.Invoke(_slowUpdateTimeSum);
@@ -222,7 +222,7 @@ namespace Core.Utils.MonoUtils
             OnApplicationQuitEvent = null;
             OnUnscaledFixedUpdate = null;
 
-            _coroutineRunner.StopAllCoroutines();
+            _coroutineRunner?.StopAllCoroutines();
             _coroutineRunner = null;
 
             DestroyMonoInjector();

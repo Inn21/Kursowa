@@ -13,7 +13,6 @@ namespace Core.Installers
         }
         public override void InstallBindings()
         {
-            // Container.Bind<SomeFeature>().AsSingle();
             
             foreach (var feature in _features)
             {
