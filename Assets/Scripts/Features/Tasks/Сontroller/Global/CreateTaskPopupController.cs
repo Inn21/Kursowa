@@ -1,25 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Features.Tasks;
+using Core.Feature.Tasks;
+using Core.Feature.Tasks.UI;
 using Features.Tasks.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-namespace Core.Feature.Tasks.UI
+namespace Features.Tasks.Сontroller.Global
 {
     public class CreateTaskPopupController : MonoBehaviour
     {
         [Header("UI елементи")]
         [SerializeField] private GameObject _popupRoot;
         [SerializeField] private TMP_InputField _taskNameInput;
-        [SerializeField] private TMP_Dropdown _taskTypeDropdown;
         [SerializeField] private TMP_Text _errorText;
         [SerializeField] private Button _createButton;
         [SerializeField] private Button _closeButton;
         [SerializeField] private Button _deleteButton;
+        [SerializeField] private TMP_Dropdown _taskTypeDropdown;
 
         [Header("Час Початку")]
         [SerializeField] private Slider _startHourSlider;
@@ -36,17 +37,14 @@ namespace Core.Feature.Tasks.UI
 
         [Inject] private TasksFeature _tasksFeature;
         [Inject] private TaskTypeFeature _taskTypeFeature;
-        
-        
+
         private Color _selectedColor;
         private DayOfWeek _currentDay;
         private TasksUIController _ownerController;
         private bool _isEditMode;
         private string _editingTaskId;
-
         private TimeSpan _slotBoundaryStart;
         private TimeSpan _slotBoundaryEnd;
-
         private float _lastValidStartHour, _lastValidStartMinute, _lastValidEndHour, _lastValidEndMinute;
         private bool _isUpdating;
 
@@ -55,15 +53,7 @@ namespace Core.Feature.Tasks.UI
             _createButton.onClick.AddListener(OnCreateOrUpdateClicked);
             _closeButton.onClick.AddListener(Hide);
             _deleteButton.onClick.AddListener(OnDeleteClicked);
-        }
-        
-        private void SetupTaskTypeDropdown()
-        {
-            _taskTypeDropdown.ClearOptions();
-            var typeDefinitions = _taskTypeFeature.GetAllTaskTypes();
-            var options = typeDefinitions.Select(def => new TMP_Dropdown.OptionData(def.Name)).ToList();
-            _taskTypeDropdown.AddOptions(options);
-            
+            SetupTaskTypeDropdown();
         }
 
         public void Show(DayOfWeek day, TimeSpan startTime, TimeSpan endTime, TasksUIController owner, TaskData taskToEdit = null)
@@ -74,8 +64,6 @@ namespace Core.Feature.Tasks.UI
             _currentDay = day;
             _taskNameInput.text = "";
             SelectColor(_colorButtons.Count > 0 ? _colorButtons[0].GetComponent<Image>().color : Color.white);
-
-            SetupTaskTypeDropdown();
             
             _slotBoundaryStart = startTime;
             _slotBoundaryEnd = endTime;
@@ -89,6 +77,17 @@ namespace Core.Feature.Tasks.UI
             {
                  _taskNameInput.text = taskToEdit.Name;
                  SelectColor(taskToEdit.TaskColor);
+
+                 var allTypes = _taskTypeFeature.GetAllTaskTypes();
+                 int currentTypeIndex = allTypes.FindIndex(def => def.Type == taskToEdit.Type);
+                 if (currentTypeIndex != -1)
+                 {
+                     _taskTypeDropdown.value = currentTypeIndex;
+                 }
+            }
+            else
+            {
+                _taskTypeDropdown.value = 0;
             }
 
             _startHourSlider.value = initialStartTime.Hours;
@@ -193,20 +192,19 @@ namespace Core.Feature.Tasks.UI
 
             var startTime = GetCurrentStartTime();
             var endTime = GetCurrentEndTime();
-            
-            var selectedTypeIndex = _taskTypeDropdown.value;
+
             var allTypes = _taskTypeFeature.GetAllTaskTypes();
-            var selectedType = allTypes[selectedTypeIndex].Type;
-            
+            var selectedType = allTypes[_taskTypeDropdown.value].Type;
+
             var taskData = new TaskData
             {
                 Id = _editingTaskId ?? Guid.NewGuid().ToString(),
                 Name = _taskNameInput.text,
                 TaskColor = _selectedColor,
+                Type = selectedType,
                 StartTimeOfDay = startTime,
                 Duration = endTime - startTime,
-                RecurrenceDays = new List<DayOfWeek> { _currentDay },
-                Type = selectedType
+                RecurrenceDays = new List<DayOfWeek> { _currentDay }
             };
 
             bool success = _isEditMode ? _tasksFeature.UpdateTask(taskData) : _tasksFeature.AddTask(taskData);
@@ -224,6 +222,14 @@ namespace Core.Feature.Tasks.UI
                 _tasksFeature.RemoveTask(_editingTaskId);
                 Hide();
             }
+        }
+        
+        private void SetupTaskTypeDropdown()
+        {
+            _taskTypeDropdown.ClearOptions();
+            var typeDefinitions = _taskTypeFeature.GetAllTaskTypes();
+            var options = typeDefinitions.Select(def => new TMP_Dropdown.OptionData(def.Name)).ToList();
+            _taskTypeDropdown.AddOptions(options);
         }
 
         private void SelectColor(Color color)
