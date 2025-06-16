@@ -1,7 +1,8 @@
 using System;
 using _PROJECT.Scripts.Application.Features.Save;
-using Core.Feature.Tasks.Model;
 using Core.Feature.PlayerStats.Model;
+using Features.Tasks;
+using Features.Tasks.Model;
 using UnityEngine;
 using Zenject;
 

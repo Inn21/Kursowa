@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using _PROJECT.Scripts.Application.Features.Save; 
-using Core.Feature.Tasks.Model;
-using Core.Utils.MonoUtils; 
+using _PROJECT.Scripts.Application.Features.Save;
+using Core.Feature.PlayerStats;
+using Core.Utils.MonoUtils;
+using Features.Tasks;
+using Features.Tasks.Model;
 using UnityEngine;
 using Zenject;
 
@@ -11,9 +13,10 @@ namespace Core.Feature.Tasks
 {
     public class TasksFeature : BaseFeature
     {
-
         [Inject] readonly ISaveFeature _saveFeature;
         [Inject] readonly MonoFeature _monoFeature;
+        [Inject] readonly TaskTypeFeature _taskTypeFeature;
+        [Inject] readonly PlayerStatsFeature _playerStatsFeature;
 
 
         public event Action OnTaskListUpdated;
@@ -149,6 +152,40 @@ namespace Core.Feature.Tasks
                 Duration = duration
             };
             return new Task(freeTimeData);
+        }
+        
+        public void CompleteTask(Task task)
+        {
+            if(task == null || task.Data.IsFreeTime || task.TodayStatus != TaskStatus.InProgress) return;
+    
+            task.Complete();
+    
+            var definition = _taskTypeFeature.GetDefinition(task.Data.Type);
+            if(definition != null)
+            {
+                foreach(var reward in definition.CompletionRewards)
+                {
+                    _playerStatsFeature.AddStat(reward.Type, reward.Value);
+                }
+            }
+            OnTaskListUpdated?.Invoke();
+        }
+
+        public void FailTask(Task task)
+        {
+            if(task == null || task.Data.IsFreeTime || task.TodayStatus != TaskStatus.InProgress) return;
+
+            task.Fail();
+
+            var definition = _taskTypeFeature.GetDefinition(task.Data.Type);
+            if(definition != null)
+            {
+                foreach(var penalty in definition.FailurePenalties)
+                {
+                    _playerStatsFeature.AddStat(penalty.Type, penalty.Value);
+                }
+            }
+            OnTaskListUpdated?.Invoke();
         }
 
         #endregion

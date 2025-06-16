@@ -5,6 +5,7 @@ using Core.Feature.PlayerStats;
 using Core.Feature.Tasks;
 using Core.Installers;
 using Core.Utils.MonoUtils;
+using Features.Tasks;
 using UnityEngine;
 using Zenject;
 
@@ -55,6 +56,7 @@ namespace _PROJECT.Scripts.Core.Client
         
         TasksFeature _tasksFeature;
         PlayerStatsFeature _playerStatsFeature;
+        TaskTypeFeature _taskTypeFeature;
         
         #endregion
 
@@ -98,10 +100,13 @@ namespace _PROJECT.Scripts.Core.Client
         {
             _tasksFeature = new TasksFeature();
             _playerStatsFeature = new PlayerStatsFeature();
+            _taskTypeFeature = new TaskTypeFeature();
+            
             var features = new List<BaseFeature>
             {
                 _tasksFeature,
-                _playerStatsFeature
+                _playerStatsFeature,
+                _taskTypeFeature
             };
 
             FeatureInstaller.Install(Container, features);
@@ -126,6 +131,7 @@ namespace _PROJECT.Scripts.Core.Client
         {
             _tasksFeature.Initialize();
             _playerStatsFeature.Initialize();
+            _taskTypeFeature.Initialize();
         }
 
         #endregion

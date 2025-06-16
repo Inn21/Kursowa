@@ -1,5 +1,6 @@
 using System;
-using Core.Feature.Tasks.Model;
+using Features.Tasks;
+using Features.Tasks.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -99,37 +100,25 @@ namespace Core.Feature.Tasks.UI
                     break;
                 case TaskStatus.Completed:
                 case TaskStatus.Failed:
-                    _disableOverlay.SetActive(true); // Показуємо "заблокований" стан
+                    _disableOverlay.SetActive(true); 
                     break;
             }
         }
 
         #region Interaction Handlers
-        // Ці методи будуть викликатися з логіки свайпів у майбутньому.
-        // Поки що їх можна викликати з кнопок для тестування.
-
-        /// <summary>
-        /// Обробник для позначення завдання як "Виконано".
-        /// </summary>
+       
         public void MarkAsDone()
         {
             if (_task.TodayStatus == TaskStatus.InProgress || _task.TodayStatus == TaskStatus.Pending)
             {
-                // Викликаємо метод з основної фічі
-                // _tasksFeature.MarkTaskAsCompleted(_task);
                 Debug.Log($"Task '{_task.Data.Name}' marked as DONE.");
             }
         }
-
-        /// <summary>
-        /// Обробник для позначення завдання як "Провалено".
-        /// </summary>
+        
         public void MarkAsFailed()
         {
             if (_task.TodayStatus == TaskStatus.InProgress || _task.TodayStatus == TaskStatus.Pending)
             {
-                // Викликаємо метод з основної фічі
-                // _tasksFeature.MarkTaskAsFailed(_task);
                 Debug.Log($"Task '{_task.Data.Name}' marked as FAILED.");
             }
         }

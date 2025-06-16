@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Core.Feature.Tasks.Model;
+using Features.Tasks;
+using Features.Tasks.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;

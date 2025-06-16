@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Core.Feature.Tasks.Model;
+using System.Linq;
+using Features.Tasks;
+using Features.Tasks.Model;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +15,7 @@ namespace Core.Feature.Tasks.UI
         [Header("UI елементи")]
         [SerializeField] private GameObject _popupRoot;
         [SerializeField] private TMP_InputField _taskNameInput;
+        [SerializeField] private TMP_Dropdown _taskTypeDropdown;
         [SerializeField] private TMP_Text _errorText;
         [SerializeField] private Button _createButton;
         [SerializeField] private Button _closeButton;
@@ -32,6 +35,9 @@ namespace Core.Feature.Tasks.UI
         [SerializeField] private List<Button> _colorButtons;
 
         [Inject] private TasksFeature _tasksFeature;
+        [Inject] private TaskTypeFeature _taskTypeFeature;
+        
+        
         private Color _selectedColor;
         private DayOfWeek _currentDay;
         private TasksUIController _ownerController;
@@ -50,6 +56,14 @@ namespace Core.Feature.Tasks.UI
             _closeButton.onClick.AddListener(Hide);
             _deleteButton.onClick.AddListener(OnDeleteClicked);
         }
+        
+        private void SetupTaskTypeDropdown()
+        {
+            _taskTypeDropdown.ClearOptions();
+            var typeDefinitions = _taskTypeFeature.GetAllTaskTypes();
+            var options = typeDefinitions.Select(def => new TMP_Dropdown.OptionData(def.Name)).ToList();
+            _taskTypeDropdown.AddOptions(options);
+        }
 
         public void Show(DayOfWeek day, TimeSpan startTime, TimeSpan endTime, TasksUIController owner, TaskData taskToEdit = null)
         {
@@ -59,6 +73,8 @@ namespace Core.Feature.Tasks.UI
             _currentDay = day;
             _taskNameInput.text = "";
             SelectColor(_colorButtons.Count > 0 ? _colorButtons[0].GetComponent<Image>().color : Color.white);
+
+            SetupTaskTypeDropdown();
             
             _slotBoundaryStart = startTime;
             _slotBoundaryEnd = endTime;
@@ -176,7 +192,11 @@ namespace Core.Feature.Tasks.UI
 
             var startTime = GetCurrentStartTime();
             var endTime = GetCurrentEndTime();
-
+            
+            var selectedTypeIndex = _taskTypeDropdown.value;
+            var allTypes = _taskTypeFeature.GetAllTaskTypes();
+            var selectedType = allTypes[selectedTypeIndex].Type;
+            
             var taskData = new TaskData
             {
                 Id = _editingTaskId ?? Guid.NewGuid().ToString(),
@@ -184,7 +204,8 @@ namespace Core.Feature.Tasks.UI
                 TaskColor = _selectedColor,
                 StartTimeOfDay = startTime,
                 Duration = endTime - startTime,
-                RecurrenceDays = new List<DayOfWeek> { _currentDay }
+                RecurrenceDays = new List<DayOfWeek> { _currentDay },
+                Type = selectedType
             };
 
             bool success = _isEditMode ? _tasksFeature.UpdateTask(taskData) : _tasksFeature.AddTask(taskData);

@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Core.Feature.Tasks.Model
+namespace Features.Tasks.Model
 {
-    
-    
     [Serializable]
     public enum TaskStatus
     {
@@ -27,7 +25,14 @@ namespace Core.Feature.Tasks.Model
     [Serializable]
     public enum TaskType
     {
-        None
+        PhysicalExercise,
+        Sleep,
+        Rest,
+        Eating,
+        WorkAndStudy,
+        Housework,
+        Creative,
+        Hygiene
     }
 
     [Serializable]
@@ -67,7 +72,6 @@ namespace Core.Feature.Tasks.Model
         public TimeSpan EndTimeOfDay => StartTimeOfDay + Duration;
 
         public List<DayOfWeek> RecurrenceDays = new List<DayOfWeek>();
-        public List<RewardPoint> RewardPoints = new List<RewardPoint>();
 
         public TaskData()
         {
@@ -112,7 +116,6 @@ namespace Core.Feature.Tasks.Model
         {
             if (TodayStatus != TaskStatus.InProgress) return;
             TodayStatus = TaskStatus.Completed;
-            GrantRewards();
         }
 
         public void Fail()
@@ -125,14 +128,6 @@ namespace Core.Feature.Tasks.Model
         {
             TodayStatus = TaskStatus.Pending;
         }
-
-        private void GrantRewards()
-        {
-            foreach (var reward in Data.RewardPoints)
-            {
-                
-                Debug.Log($"Надано {reward.Value} балів типу {reward.Type} за '{Data.Name}' завдання.");
-            }
-        }
+        
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
-using Core.Feature.Tasks.Model;
+using Features.Tasks;
+using Features.Tasks.Model;
 
 namespace Core.Feature.Tasks
 {

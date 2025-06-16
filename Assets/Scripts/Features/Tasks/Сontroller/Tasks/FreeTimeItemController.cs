@@ -1,5 +1,6 @@
 using System;
-using Core.Feature.Tasks.Model;
+using Features.Tasks;
+using Features.Tasks.Model;
 using UnityEngine;
 using UnityEngine.UI;
 
