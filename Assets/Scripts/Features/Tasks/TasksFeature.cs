@@ -56,8 +56,7 @@ namespace Features.Tasks
                 return false;
             
             _taskTemplates.Add(newTaskData);
-            RegenerateAllWeeklyTasks();
-            ApplySavedStatusesForToday();
+            RegenerateWithStatePreservation();
             OnTaskListUpdated?.Invoke();
             return true;
         }
@@ -71,8 +70,7 @@ namespace Features.Tasks
             if (taskIndex != -1)
             {
                 _taskTemplates[taskIndex] = updatedTaskData;
-                RegenerateAllWeeklyTasks();
-                ApplySavedStatusesForToday();
+                RegenerateWithStatePreservation();
                 OnTaskListUpdated?.Invoke();
                 return true;
             }
@@ -84,8 +82,7 @@ namespace Features.Tasks
             var itemsRemoved = _taskTemplates.RemoveAll(t => t.Id == taskId);
             if (itemsRemoved > 0)
             {
-                RegenerateAllWeeklyTasks();
-                ApplySavedStatusesForToday();
+                RegenerateWithStatePreservation();
                 OnTaskListUpdated?.Invoke();
             }
         }
@@ -200,6 +197,37 @@ namespace Features.Tasks
                 {
                     FailTask(task);
                 }
+            }
+        }
+
+        private void RegenerateWithStatePreservation()
+        {
+            var runtimeState = new List<TaskStatusRecord>();
+            var today = DateTime.Today;
+            if (_weeklyTasks.ContainsKey(today.DayOfWeek))
+            {
+                foreach (var task in _weeklyTasks[today.DayOfWeek])
+                {
+                    if (!task.Data.IsFreeTime && task.TodayStatus != TaskStatus.Pending)
+                    {
+                        runtimeState.Add(new TaskStatusRecord
+                        {
+                            TaskTemplateId = task.Data.Id,
+                            Status = task.TodayStatus
+                        });
+                    }
+                }
+            }
+
+            RegenerateAllWeeklyTasks();
+
+            foreach (var record in runtimeState)
+            {
+                var task = _weeklyTasks[today.DayOfWeek]
+                    .FirstOrDefault(t => t.Data.Id == record.TaskTemplateId);
+                
+                if (task != null)
+                    task.ApplyLoadedStatus(record.Status);
             }
         }
 
