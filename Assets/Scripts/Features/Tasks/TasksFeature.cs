@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using _PROJECT.Scripts.Application.Features.Save;
 using Core.Feature;
 using Core.Feature.PlayerStats;
+using Core.Feature.Save;
 using Core.Feature.Tasks;
 using Core.Utils.MonoUtils;
 using Features.Tasks.Model;
@@ -30,12 +30,23 @@ namespace Features.Tasks
         private const string TEMPLATES_SAVE_KEY = "TaskTemplatesData";
         private const string STATUS_SAVE_KEY = "TaskStatusHistory";
         private readonly TimeSpan GracePeriod = TimeSpan.FromMinutes(30);
+        
+        private struct RuntimeTaskState
+        {
+            public string TaskTemplateId;
+            public TaskStatus Status;
+            public bool IsActionHandled;
+        }
 
         public void Initialize()
         {
-            LoadData();
+            bool isNewUser = LoadData();
             RegenerateAllWeeklyTasks();
             ApplySavedStatusesForToday();
+            if (isNewUser)
+            {
+                ForgivePastTasksForToday();
+            }
             _monoFeature.OnPerSecondUpdate += TrackTasks;
             _monoFeature.OnApplicationQuitEvent += SaveData;
         }
@@ -52,7 +63,7 @@ namespace Features.Tasks
 
         public bool AddTask(TaskData newTaskData)
         {
-            if (!IsTimeSlotAvailable(newTaskData.RecurrenceDays.First(), newTaskData.StartTimeOfDay, newTaskData.EndTimeOfDay, null))
+            if (!IsTimeSlotAvailable(newTaskData.Day, newTaskData.StartTimeOfDay, newTaskData.EndTimeOfDay, null))
                 return false;
             
             _taskTemplates.Add(newTaskData);
@@ -63,7 +74,7 @@ namespace Features.Tasks
 
         public bool UpdateTask(TaskData updatedTaskData)
         {
-            if (!IsTimeSlotAvailable(updatedTaskData.RecurrenceDays.First(), updatedTaskData.StartTimeOfDay, updatedTaskData.EndTimeOfDay, updatedTaskData.Id))
+            if (!IsTimeSlotAvailable(updatedTaskData.Day, updatedTaskData.StartTimeOfDay, updatedTaskData.EndTimeOfDay, updatedTaskData.Id))
                 return false;
 
             var taskIndex = _taskTemplates.FindIndex(t => t.Id == updatedTaskData.Id);
@@ -202,18 +213,19 @@ namespace Features.Tasks
 
         private void RegenerateWithStatePreservation()
         {
-            var runtimeState = new List<TaskStatusRecord>();
+            var runtimeState = new List<RuntimeTaskState>();
             var today = DateTime.Today;
             if (_weeklyTasks.ContainsKey(today.DayOfWeek))
             {
                 foreach (var task in _weeklyTasks[today.DayOfWeek])
                 {
-                    if (!task.Data.IsFreeTime && task.TodayStatus != TaskStatus.Pending)
+                    if (!task.Data.IsFreeTime)
                     {
-                        runtimeState.Add(new TaskStatusRecord
+                        runtimeState.Add(new RuntimeTaskState
                         {
                             TaskTemplateId = task.Data.Id,
-                            Status = task.TodayStatus
+                            Status = task.TodayStatus,
+                            IsActionHandled = task.IsActionHandled
                         });
                     }
                 }
@@ -227,7 +239,7 @@ namespace Features.Tasks
                     .FirstOrDefault(t => t.Data.Id == record.TaskTemplateId);
                 
                 if (task != null)
-                    task.ApplyLoadedStatus(record.Status);
+                    task.ApplyLoadedStatus(record.Status, record.IsActionHandled);
             }
         }
 
@@ -246,14 +258,17 @@ namespace Features.Tasks
         {
             var timeline = new List<Task>();
             var realTasksForDay = _taskTemplates
-                .Where(t => !t.IsFreeTime && t.RecurrenceDays.Contains(day))
+                .Where(t => !t.IsFreeTime && t.Day == day)
                 .OrderBy(t => t.StartTimeOfDay)
                 .ToList();
 
             var currentTime = TimeSpan.Zero;
+            var endOfDay = new TimeSpan(23, 59, 0);
             
             foreach (var taskData in realTasksForDay)
             {
+                if (taskData.StartTimeOfDay > endOfDay) continue;
+
                 var gap = taskData.StartTimeOfDay - currentTime;
                 if (gap >= TimeSpan.FromMinutes(1))
                     timeline.Add(CreateFreeTimeSlot(currentTime, gap));
@@ -262,7 +277,6 @@ namespace Features.Tasks
                 currentTime = taskData.EndTimeOfDay;
             }
             
-            var endOfDay = TimeSpan.FromHours(24);
             if (currentTime < endOfDay)
             {
                 var finalGap = endOfDay - currentTime;
@@ -283,14 +297,26 @@ namespace Features.Tasks
                     .FirstOrDefault(t => t.Data.Id == record.TaskTemplateId);
                 
                 if (task != null)
-                    task.ApplyLoadedStatus(record.Status);
+                    task.ApplyLoadedStatus(record.Status, true);
+            }
+        }
+
+        private void ForgivePastTasksForToday()
+        {
+            var timeNow = DateTime.Now.TimeOfDay;
+            foreach (var task in _weeklyTasks[DateTime.Today.DayOfWeek])
+            {
+                if (!task.Data.IsFreeTime && task.Data.EndTimeOfDay < timeNow)
+                {
+                    task.SetActionHandled();
+                }
             }
         }
 
         public bool IsTimeSlotAvailable(DayOfWeek day, TimeSpan start, TimeSpan end, string excludeTaskId)
         {
             return !_taskTemplates.Any(t => !t.IsFreeTime && t.Id != excludeTaskId && 
-                                            t.RecurrenceDays.Contains(day) && 
+                                            t.Day == day && 
                                             start < t.EndTimeOfDay && end > t.StartTimeOfDay);
         }
 
@@ -326,16 +352,58 @@ namespace Features.Tasks
             _saveFeature.Save(JsonUtility.ToJson(_taskStatusHistory), STATUS_SAVE_KEY);
         }
 
-        private void LoadData()
+        private bool LoadData()
         {
             string templatesJson = _saveFeature.Load(TEMPLATES_SAVE_KEY, "{}");
+            if (string.IsNullOrEmpty(templatesJson) || templatesJson == "{}")
+            {
+                CreateDefaultSchedule();
+                string historyJson = _saveFeature.Load(STATUS_SAVE_KEY, "{}");
+                _taskStatusHistory = JsonUtility.FromJson<TaskStatusHistory>(historyJson) ?? new TaskStatusHistory();
+                return true;
+            }
+            
             var templatesWrapper = JsonUtility.FromJson<TaskDataWrapper>(templatesJson);
             _taskTemplates = templatesWrapper?.TaskTemplates ?? new List<TaskData>();
+            if (_taskTemplates.Count == 0)
+            {
+                CreateDefaultSchedule();
+                string historyJson = _saveFeature.Load(STATUS_SAVE_KEY, "{}");
+                _taskStatusHistory = JsonUtility.FromJson<TaskStatusHistory>(historyJson) ?? new TaskStatusHistory();
+                return true;
+            }
+
             foreach (var template in _taskTemplates)
                 template.RestoreTimeSpans();
 
-            string historyJson = _saveFeature.Load(STATUS_SAVE_KEY, "{}");
-            _taskStatusHistory = JsonUtility.FromJson<TaskStatusHistory>(historyJson) ?? new TaskStatusHistory();
+            string historyJsonOnLoad = _saveFeature.Load(STATUS_SAVE_KEY, "{}");
+            _taskStatusHistory = JsonUtility.FromJson<TaskStatusHistory>(historyJsonOnLoad) ?? new TaskStatusHistory();
+            return false;
+        }
+
+        private void CreateDefaultSchedule()
+        {
+            _taskTemplates = new List<TaskData>();
+            foreach (DayOfWeek day in Enum.GetValues(typeof(DayOfWeek)))
+            {
+                bool isWorkDay = day != DayOfWeek.Saturday && day != DayOfWeek.Sunday;
+
+                _taskTemplates.Add(new TaskData { Name = "Вечірній сон", Type = TaskType.Sleep, StartTimeOfDay = new TimeSpan(23, 0, 0), Duration = new TimeSpan(0, 59, 0), Day = day });
+                _taskTemplates.Add(new TaskData { Name = "Ранковий сон", Type = TaskType.Sleep, StartTimeOfDay = new TimeSpan(0, 0, 0), Duration = new TimeSpan(7, 0, 0), Day = day });
+                _taskTemplates.Add(new TaskData { Name = "Ранкова гігієна", Type = TaskType.Hygiene, StartTimeOfDay = new TimeSpan(7, 0, 0), Duration = new TimeSpan(0, 30, 0), Day = day });
+                _taskTemplates.Add(new TaskData { Name = "Сніданок", Type = TaskType.Eating, StartTimeOfDay = new TimeSpan(7, 30, 0), Duration = new TimeSpan(0, 30, 0), Day = day });
+                
+                if (isWorkDay)
+                {
+                    _taskTemplates.Add(new TaskData { Name = "Робота/Навчання", Type = TaskType.WorkAndStudy, StartTimeOfDay = new TimeSpan(9, 0, 0), Duration = new TimeSpan(8, 0, 0), Day = day });
+                    _taskTemplates.Add(new TaskData { Name = "Обід", Type = TaskType.Eating, StartTimeOfDay = new TimeSpan(13, 0, 0), Duration = new TimeSpan(1, 0, 0), Day = day });
+                }
+
+                _taskTemplates.Add(new TaskData { Name = "Вечеря", Type = TaskType.Eating, StartTimeOfDay = new TimeSpan(19, 0, 0), Duration = new TimeSpan(0, 45, 0), Day = day });
+            }
+            
+            foreach (var template in _taskTemplates)
+                template.PrepareForSerialization();
         }
     }
 }

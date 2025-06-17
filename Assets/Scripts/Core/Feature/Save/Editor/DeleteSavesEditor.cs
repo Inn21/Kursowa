@@ -2,9 +2,8 @@ using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-namespace _PROJECT.Scripts.Application.Features.Save.Editor
+namespace Core.Feature.Save.Editor
 {
     namespace FlopHouse.Saves.Editor
     {
@@ -20,14 +19,12 @@ namespace _PROJECT.Scripts.Application.Features.Save.Editor
                 };
             }
 
-            [MenuItem("FlopHouse/Saves/Delete General Save")]
+            [MenuItem("App/Saves/Delete General Save")]
             public static void DeleteGeneralSaves()
             {
                 DeleteSave(SaveFileVariant.General);
             }
-
-            [MenuItem("FlopHouse/Saves/Delete Player Save")]
-
+            
             private static void DeleteSave(SaveFileVariant variant)
             {
                 var path = GetSavePath(variant);

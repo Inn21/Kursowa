@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace _PROJECT.Scripts.Application.Features.Save
+namespace Core.Feature.Save
 {
     [Serializable]
     public class SaveData

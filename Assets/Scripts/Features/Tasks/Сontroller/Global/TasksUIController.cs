@@ -66,7 +66,7 @@ namespace Features.Tasks.Сontroller.Global
         }
         public void ShowEditPopup(TaskData taskData)
         {
-            var day = taskData.RecurrenceDays.First();
+            var day = taskData.Day;
             _createTaskPopup.Show(day, TimeSpan.Zero, TimeSpan.FromHours(24), this, taskData);
         }
         

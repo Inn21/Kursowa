@@ -1,4 +1,4 @@
-namespace _PROJECT.Scripts.Application.Features.Save
+namespace Core.Feature.Save
 {
     public enum SaveFileVariant
     {

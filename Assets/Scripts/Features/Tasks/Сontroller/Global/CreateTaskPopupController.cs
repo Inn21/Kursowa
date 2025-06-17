@@ -204,7 +204,7 @@ namespace Features.Tasks.Сontroller.Global
                 Type = selectedType,
                 StartTimeOfDay = startTime,
                 Duration = endTime - startTime,
-                RecurrenceDays = new List<DayOfWeek> { _currentDay }
+                Day = _currentDay
             };
 
             bool success = _isEditMode ? _tasksFeature.UpdateTask(taskData) : _tasksFeature.AddTask(taskData);

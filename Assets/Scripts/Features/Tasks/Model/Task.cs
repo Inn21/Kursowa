@@ -15,19 +15,6 @@ namespace Features.Tasks.Model
     }
     
     [Serializable]
-    public enum TaskType
-    {
-        PhysicalExercise,
-        Sleep,
-        Rest,
-        Eating,
-        WorkAndStudy,
-        Housework,
-        Creative,
-        Hygiene
-    }
-    
-    [Serializable]
     public enum RewardType { Strength, Intelligence, Health, Xp }
 
     [Serializable]
@@ -44,6 +31,7 @@ namespace Features.Tasks.Model
         public string Name;
         public TaskType Type;
         public Color TaskColor;
+        public DayOfWeek Day;
         public bool IsFreeTime;
         public long StartTimeTicks;
         public long DurationTicks;
@@ -54,7 +42,6 @@ namespace Features.Tasks.Model
         public TimeSpan Duration;
         
         public TimeSpan EndTimeOfDay => StartTimeOfDay + Duration;
-        public List<DayOfWeek> RecurrenceDays = new List<DayOfWeek>();
 
         public TaskData()
         {
@@ -91,13 +78,10 @@ namespace Features.Tasks.Model
             IsActionHandled = false;
         }
         
-        public void ApplyLoadedStatus(TaskStatus status)
+        public void ApplyLoadedStatus(TaskStatus status, bool isHandled)
         {
             TodayStatus = status;
-            if (status == TaskStatus.Completed || status == TaskStatus.Failed)
-            {
-                IsActionHandled = true;
-            }
+            IsActionHandled = isHandled;
         }
 
         public void SetActionHandled()
