@@ -6,6 +6,7 @@ using Core.Feature.Tasks;
 using Core.Installers;
 using Core.Utils.MonoUtils;
 using Features.Character;
+using Features.Notifications;
 using Features.Room;
 using Features.Tasks;
 using UnityEngine;
@@ -53,6 +54,7 @@ namespace _PROJECT.Scripts.Core.Client
         #region CoreFeatures
         private MonoFeature _monoService;
         TasksFeature _tasksFeature;
+        NotificationFeature _notificationFeature;
         #endregion
 
         #region Features
@@ -89,11 +91,13 @@ namespace _PROJECT.Scripts.Core.Client
         private void CoreFeatureBindings()
         {
             _monoService = new MonoFeature();
+            _notificationFeature = new NotificationFeature();
             _tasksFeature = new TasksFeature();
             
             var coreFeatures = new List<BaseFeature>
             {
                 _monoService,
+                _notificationFeature,
                 _tasksFeature
             };
 
@@ -131,6 +135,7 @@ namespace _PROJECT.Scripts.Core.Client
         private void InitInitializableCoreFeatures()
         {
             _monoService.Initialize();
+            _notificationFeature.Initialize();
             _tasksFeature.Initialize();
         }
 

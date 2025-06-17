@@ -6,6 +6,7 @@ using Core.Feature.PlayerStats;
 using Core.Feature.Save;
 using Core.Feature.Tasks;
 using Core.Utils.MonoUtils;
+using Features.Notifications;
 using Features.Tasks.Model;
 using UnityEngine;
 using Zenject;
@@ -21,6 +22,7 @@ namespace Features.Tasks
         [Inject] private readonly MonoFeature _monoFeature;
         [Inject] private readonly PlayerStatsFeature _playerStatsFeature;
         [Inject] private readonly TaskTypeFeature _taskTypeFeature;
+        [Inject] private readonly NotificationFeature _notificationFeature;
 
         private List<TaskData> _taskTemplates = new List<TaskData>();
         private readonly Dictionary<DayOfWeek, List<Task>> _weeklyTasks = new Dictionary<DayOfWeek, List<Task>>();
@@ -40,13 +42,19 @@ namespace Features.Tasks
 
         public void Initialize()
         {
+            _notificationFeature.Initialize();
             bool isNewUser = LoadData();
+            
             RegenerateAllWeeklyTasks();
             ApplySavedStatusesForToday();
+            
             if (isNewUser)
             {
                 ForgivePastTasksForToday();
             }
+            
+            ScheduleAllNotifications();
+            
             _monoFeature.OnPerSecondUpdate += TrackTasks;
             _monoFeature.OnApplicationQuitEvent += SaveData;
         }
@@ -68,6 +76,7 @@ namespace Features.Tasks
             
             _taskTemplates.Add(newTaskData);
             RegenerateWithStatePreservation();
+            ScheduleAllNotifications();
             OnTaskListUpdated?.Invoke();
             return true;
         }
@@ -82,6 +91,7 @@ namespace Features.Tasks
             {
                 _taskTemplates[taskIndex] = updatedTaskData;
                 RegenerateWithStatePreservation();
+                ScheduleAllNotifications();
                 OnTaskListUpdated?.Invoke();
                 return true;
             }
@@ -90,12 +100,18 @@ namespace Features.Tasks
 
         public void RemoveTask(string taskId)
         {
-            var itemsRemoved = _taskTemplates.RemoveAll(t => t.Id == taskId);
-            if (itemsRemoved > 0)
+            var taskToRemove = _taskTemplates.FirstOrDefault(t => t.Id == taskId);
+            if (taskToRemove == null) return;
+            
+            var weeklyTaskInstance = _weeklyTasks[taskToRemove.Day].FirstOrDefault(t => t.Data.Id == taskId);
+            if (weeklyTaskInstance != null)
             {
-                RegenerateWithStatePreservation();
-                OnTaskListUpdated?.Invoke();
+                _notificationFeature.CancelNotification(weeklyTaskInstance.Id);
             }
+
+            _taskTemplates.Remove(taskToRemove);
+            RegenerateWithStatePreservation();
+            OnTaskListUpdated?.Invoke();
         }
         
         public List<Task> GetTasksForDay(DayOfWeek day)
@@ -114,27 +130,21 @@ namespace Features.Tasks
                 var activeTask = _weeklyTasks[dayOfWeek]
                     .FirstOrDefault(t => !t.Data.IsFreeTime && (t.TodayStatus == TaskStatus.InProgress || t.TodayStatus == TaskStatus.AwaitingConfirmation));
                 if (activeTask != null)
-                {
                     return activeTask;
-                }
             }
 
             for (int i = 0; i < 7; i++)
             {
                 var checkDay = now.AddDays(i).DayOfWeek;
                 if (!_weeklyTasks.ContainsKey(checkDay)) continue;
-
-                var tasksForDay = _weeklyTasks[checkDay];
                 
-                var upcomingTask = tasksForDay
+                var upcomingTask = _weeklyTasks[checkDay]
                     .Where(t => !t.Data.IsFreeTime && t.TodayStatus == TaskStatus.Pending)
                     .OrderBy(t => t.Data.StartTimeOfDay)
                     .FirstOrDefault(t => i > 0 || t.Data.StartTimeOfDay > timeOfDay);
 
                 if (upcomingTask != null)
-                {
                     return upcomingTask;
-                }
             }
             
             return null;
@@ -146,6 +156,7 @@ namespace Features.Tasks
             
             task.Complete();
             task.SetActionHandled();
+            _notificationFeature.CancelNotification(task.Id);
             
             var definition = _taskTypeFeature.GetDefinition(task.Data.Type);
             if(definition != null)
@@ -162,6 +173,7 @@ namespace Features.Tasks
 
             task.Fail();
             task.SetActionHandled();
+            _notificationFeature.CancelNotification(task.Id);
 
             var definition = _taskTypeFeature.GetDefinition(task.Data.Type);
             if(definition != null)
@@ -178,6 +190,7 @@ namespace Features.Tasks
             {
                 RegenerateAllWeeklyTasks();
                 ApplySavedStatusesForToday();
+                ScheduleAllNotifications();
                 OnTaskListUpdated?.Invoke();
             }
 
@@ -285,6 +298,25 @@ namespace Features.Tasks
             }
             return timeline;
         }
+        
+        private void ScheduleAllNotifications()
+        {
+            _notificationFeature.CancelAllNotifications();
+            for (int i = 0; i < 7; i++)
+            {
+                var day = DateTime.Today.AddDays(i).DayOfWeek;
+                if (_weeklyTasks.ContainsKey(day))
+                {
+                    foreach (var task in _weeklyTasks[day])
+                    {
+                        if (!task.Data.IsFreeTime && task.TodayStatus == TaskStatus.Pending)
+                        {
+                            _notificationFeature.ScheduleNotification(task);
+                        }
+                    }
+                }
+            }
+        }
 
         private void ApplySavedStatusesForToday()
         {
@@ -388,7 +420,7 @@ namespace Features.Tasks
             {
                 bool isWorkDay = day != DayOfWeek.Saturday && day != DayOfWeek.Sunday;
 
-                _taskTemplates.Add(new TaskData { Name = "Вечірній сон", Type = TaskType.Sleep, StartTimeOfDay = new TimeSpan(23, 0, 0), Duration = new TimeSpan(0, 59, 0), Day = day });
+                _taskTemplates.Add(new TaskData { Name = "Вечірній сон", Type = TaskType.Sleep, StartTimeOfDay = new TimeSpan(23, 0, 0), Duration = new TimeSpan(1, 0, 0), Day = day });
                 _taskTemplates.Add(new TaskData { Name = "Ранковий сон", Type = TaskType.Sleep, StartTimeOfDay = new TimeSpan(0, 0, 0), Duration = new TimeSpan(7, 0, 0), Day = day });
                 _taskTemplates.Add(new TaskData { Name = "Ранкова гігієна", Type = TaskType.Hygiene, StartTimeOfDay = new TimeSpan(7, 0, 0), Duration = new TimeSpan(0, 30, 0), Day = day });
                 _taskTemplates.Add(new TaskData { Name = "Сніданок", Type = TaskType.Eating, StartTimeOfDay = new TimeSpan(7, 30, 0), Duration = new TimeSpan(0, 30, 0), Day = day });
