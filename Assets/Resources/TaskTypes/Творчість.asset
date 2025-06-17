@@ -17,6 +17,7 @@ MonoBehaviour:
   Description: "\u0427\u0438\u0442\u0430\u043D\u043D\u044F, \u043C\u0430\u043B\u044E\u0432\u0430\u043D\u043D\u044F,
     \u043C\u0443\u0437\u0438\u043A\u0430, \u0440\u0443\u043A\u043E\u0434\u0456\u043B\u043B\u044F"
   Icon: {fileID: 21300000, guid: bf99bf5f0d2339f44b1dca9c18a3b4da, type: 3}
+  AnimationTriggerName: Work
   CompletionRewards:
   - Value: 1
     Type: 1

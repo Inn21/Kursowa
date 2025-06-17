@@ -6,9 +6,10 @@ using Features.Tasks.Model;
 public class TaskTypeDefinitionSO : ScriptableObject
 {
     public TaskType Type;
-    public string Name;
+    public new string Name;
     [TextArea] public string Description;
     public Sprite Icon;
+    public string AnimationTriggerName; 
     public List<RewardPoint> CompletionRewards;
     public List<RewardPoint> FailurePenalties;
 }

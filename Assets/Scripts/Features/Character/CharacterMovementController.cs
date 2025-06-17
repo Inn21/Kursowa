@@ -10,6 +10,7 @@ namespace Features.Character
         private Animator _animator;
         
         private static readonly int IsMoving = Animator.StringToHash("IsMoving");
+        private string _currentTaskAnimation;
 
         private void Awake()
         {
@@ -19,19 +20,51 @@ namespace Features.Character
 
         private void Update()
         {
-            if (_agent.remainingDistance > _agent.stoppingDistance)
+            bool isMoving = _agent.velocity.sqrMagnitude > 0.01f;
+            _animator.SetBool(IsMoving, isMoving);
+        }
+
+        public bool HasReachedDestination()
+        {
+            if (!_agent.pathPending)
             {
-                _animator.SetBool(IsMoving, true);
+                if (_agent.remainingDistance <= _agent.stoppingDistance)
+                {
+                    if (!_agent.hasPath || _agent.velocity.sqrMagnitude == 0f)
+                    {
+                        return true;
+                    }
+                }
             }
-            else
-            {
-                _animator.SetBool(IsMoving, false);
-            }
+            return false;
         }
 
         public void MoveToPoint(Vector3 destination)
         {
-            _agent.SetDestination(destination);
+            StopTaskAnimation();
+            if (_agent.isOnNavMesh)
+            {
+                _agent.SetDestination(destination);
+            }
+        }
+
+        public void PlayTaskAnimation(string triggerName)
+        {
+            if (string.IsNullOrEmpty(triggerName) || _animator == null) return;
+            
+            StopTaskAnimation();
+            
+            _currentTaskAnimation = triggerName;
+            _animator.SetTrigger(_currentTaskAnimation);
+        }
+
+        public void StopTaskAnimation()
+        {
+            if (!string.IsNullOrEmpty(_currentTaskAnimation) && _animator != null)
+            {
+                _animator.ResetTrigger(_currentTaskAnimation);
+                _currentTaskAnimation = null;
+            }
         }
     }
 }
