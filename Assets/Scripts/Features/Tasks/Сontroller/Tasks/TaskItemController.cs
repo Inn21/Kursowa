@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Features.Tasks.Model;
 using Features.Tasks.Сontroller.Global;
 using TMPro;
@@ -7,7 +9,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Zenject;
 
-namespace Features.Tasks.Controller.Tasks
+namespace Features.Tasks.Сontroller.Tasks
 {
     public class TaskItemController : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
@@ -30,6 +32,11 @@ namespace Features.Tasks.Controller.Tasks
         [SerializeField] private GameObject _leftSwipeVisual;
         [SerializeField] private float _swipeThreshold = 200f;
         [SerializeField] private Image _baseBackground;
+        
+        [Header("Відображення статистики")]
+        [SerializeField] private List<StatDisplay> _rewardDisplays;
+        [SerializeField] private List<StatDisplay> _penaltyDisplays;
+        [SerializeField] private List<StatIconMapping> _statIcons;
         
         [Inject] private readonly TasksFeature _tasksFeature;
         [Inject] private readonly TaskTypeFeature _taskTypeFeature;
@@ -69,6 +76,7 @@ namespace Features.Tasks.Controller.Tasks
                  _editButton.onClick.AddListener(OnEditClicked);
             
             UpdateVisualState();
+            UpdateStatDisplays(definition);
         }
 
         private void OnEnable()
@@ -106,6 +114,34 @@ namespace Features.Tasks.Controller.Tasks
                 case TaskStatus.AwaitingConfirmation: _baseBackground.color = _awaitingColor; break;
                 case TaskStatus.Completed: _baseBackground.color = _completedColor; break;
                 case TaskStatus.Failed: _baseBackground.color = _failedColor; break;
+            }
+        }
+        
+        private void UpdateStatDisplays(TaskTypeDefinitionSO definition)
+        {
+            _rewardDisplays.ForEach(d => d.Hide());
+            _penaltyDisplays.ForEach(d => d.Hide());
+
+            if (definition == null) return;
+            
+            for(int i = 0; i < definition.CompletionRewards.Count && i < _rewardDisplays.Count; i++)
+            {
+                var reward = definition.CompletionRewards[i];
+                var iconMapping = _statIcons.FirstOrDefault(m => m.Type == reward.Type);
+                if (iconMapping != null)
+                {
+                    _rewardDisplays[i].SetData(iconMapping.Icon, reward.Value);
+                }
+            }
+            
+            for(int i = 0; i < definition.FailurePenalties.Count && i < _penaltyDisplays.Count; i++)
+            {
+                var penalty = definition.FailurePenalties[i];
+                var iconMapping = _statIcons.FirstOrDefault(m => m.Type == penalty.Type);
+                if (iconMapping != null)
+                {
+                    _penaltyDisplays[i].SetData(iconMapping.Icon, penalty.Value);
+                }
             }
         }
         

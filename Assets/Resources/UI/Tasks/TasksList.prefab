@@ -730,7 +730,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2946188866693579708, guid: 0beb52725f873004d948ef6de0e54c99, type: 3}
       propertyPath: m_fontSize
-      value: 53.7
+      value: 51.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2946188866693579708, guid: 0beb52725f873004d948ef6de0e54c99, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2164040, guid: d480a32f0d772cb428658042c0b25721, type: 2}
+    - target: {fileID: 2946188866693579708, guid: 0beb52725f873004d948ef6de0e54c99, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3576121077831603015, guid: 0beb52725f873004d948ef6de0e54c99, type: 3}
       propertyPath: m_Pivot.x
