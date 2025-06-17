@@ -5,6 +5,8 @@ using Core.Feature.PlayerStats;
 using Core.Feature.Tasks;
 using Core.Installers;
 using Core.Utils.MonoUtils;
+using Features.Character;
+using Features.Room;
 using Features.Tasks;
 using UnityEngine;
 using Zenject;
@@ -50,14 +52,14 @@ namespace _PROJECT.Scripts.Core.Client
 
         #region CoreFeatures
         private MonoFeature _monoService;
+        TasksFeature _tasksFeature;
         #endregion
 
         #region Features
-        
-        TasksFeature _tasksFeature;
         PlayerStatsFeature _playerStatsFeature;
         TaskTypeFeature _taskTypeFeature;
-        
+        CharacterTaskHandler _characterTaskHandler;
+        RoomInteractionFeature _roomInteractionFeature;
         #endregion
 
         #region Bindings
@@ -87,10 +89,12 @@ namespace _PROJECT.Scripts.Core.Client
         private void CoreFeatureBindings()
         {
             _monoService = new MonoFeature();
+            _tasksFeature = new TasksFeature();
             
             var coreFeatures = new List<BaseFeature>
             {
                 _monoService,
+                _tasksFeature
             };
 
             CoreFeatureInstaller.Install(Container, coreFeatures);
@@ -98,15 +102,17 @@ namespace _PROJECT.Scripts.Core.Client
 
         private void FeatureBindings()
         {
-            _tasksFeature = new TasksFeature();
             _playerStatsFeature = new PlayerStatsFeature();
             _taskTypeFeature = new TaskTypeFeature();
+            _characterTaskHandler = new CharacterTaskHandler();
+            _roomInteractionFeature = new RoomInteractionFeature();
             
             var features = new List<BaseFeature>
             {
-                _tasksFeature,
                 _playerStatsFeature,
-                _taskTypeFeature
+                _taskTypeFeature,
+                _characterTaskHandler,
+                _roomInteractionFeature
             };
 
             FeatureInstaller.Install(Container, features);
@@ -125,13 +131,15 @@ namespace _PROJECT.Scripts.Core.Client
         private void InitInitializableCoreFeatures()
         {
             _monoService.Initialize();
+            _tasksFeature.Initialize();
         }
 
         private void InitInitializableFeatures()
         {
-            _tasksFeature.Initialize();
             _playerStatsFeature.Initialize();
             _taskTypeFeature.Initialize();
+            _characterTaskHandler.Initialize();
+            _roomInteractionFeature.Initialize();
         }
 
         #endregion
