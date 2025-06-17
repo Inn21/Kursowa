@@ -95,10 +95,21 @@ namespace Features.Tasks
             return _weeklyTasks.ContainsKey(day) ? _weeklyTasks[day] : new List<Task>();
         }
 
-        public Task GetNextUpcomingTask()
+        public Task GetCurrentOrNextTask()
         {
             var now = DateTime.Now;
+            var dayOfWeek = now.DayOfWeek;
             var timeOfDay = now.TimeOfDay;
+
+            if (_weeklyTasks.ContainsKey(dayOfWeek))
+            {
+                var activeTask = _weeklyTasks[dayOfWeek]
+                    .FirstOrDefault(t => !t.Data.IsFreeTime && (t.TodayStatus == TaskStatus.InProgress || t.TodayStatus == TaskStatus.AwaitingConfirmation));
+                if (activeTask != null)
+                {
+                    return activeTask;
+                }
+            }
 
             for (int i = 0; i < 7; i++)
             {
@@ -108,7 +119,7 @@ namespace Features.Tasks
                 var tasksForDay = _weeklyTasks[checkDay];
                 
                 var upcomingTask = tasksForDay
-                    .Where(t => !t.Data.IsFreeTime && !t.IsActionHandled)
+                    .Where(t => !t.Data.IsFreeTime && t.TodayStatus == TaskStatus.Pending)
                     .OrderBy(t => t.Data.StartTimeOfDay)
                     .FirstOrDefault(t => i > 0 || t.Data.StartTimeOfDay > timeOfDay);
 
@@ -117,6 +128,7 @@ namespace Features.Tasks
                     return upcomingTask;
                 }
             }
+            
             return null;
         }
 

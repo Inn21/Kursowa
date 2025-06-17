@@ -36,7 +36,7 @@ namespace Features.UI
 
         private void UpdateDisplay()
         {
-            var nextTask = _tasksFeature.GetNextUpcomingTask();
+            var nextTask = _tasksFeature.GetCurrentOrNextTask();
 
             if (nextTask == null)
             {
