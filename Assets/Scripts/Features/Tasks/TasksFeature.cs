@@ -95,6 +95,31 @@ namespace Features.Tasks
             return _weeklyTasks.ContainsKey(day) ? _weeklyTasks[day] : new List<Task>();
         }
 
+        public Task GetNextUpcomingTask()
+        {
+            var now = DateTime.Now;
+            var timeOfDay = now.TimeOfDay;
+
+            for (int i = 0; i < 7; i++)
+            {
+                var checkDay = now.AddDays(i).DayOfWeek;
+                if (!_weeklyTasks.ContainsKey(checkDay)) continue;
+
+                var tasksForDay = _weeklyTasks[checkDay];
+                
+                var upcomingTask = tasksForDay
+                    .Where(t => !t.Data.IsFreeTime && !t.IsActionHandled)
+                    .OrderBy(t => t.Data.StartTimeOfDay)
+                    .FirstOrDefault(t => i > 0 || t.Data.StartTimeOfDay > timeOfDay);
+
+                if (upcomingTask != null)
+                {
+                    return upcomingTask;
+                }
+            }
+            return null;
+        }
+
         public void CompleteTask(Task task)
         {
             if(task == null || task.Data.IsFreeTime || task.IsActionHandled || (task.TodayStatus != TaskStatus.InProgress && task.TodayStatus != TaskStatus.AwaitingConfirmation)) return;
