@@ -13,15 +13,6 @@ namespace Features.Tasks.Model
         Completed,
         Failed
     }
-
-    [Serializable]
-    public enum RewardType
-    {
-        Strength,
-        Intelligence,
-        Health,
-        Xp
-    }
     
     [Serializable]
     public enum TaskType
@@ -35,18 +26,15 @@ namespace Features.Tasks.Model
         Creative,
         Hygiene
     }
+    
+    [Serializable]
+    public enum RewardType { Strength, Intelligence, Health, Xp }
 
     [Serializable]
-    public class RewardPoint
-    {
+    public class RewardPoint {
         public int Value;
         public RewardType Type;
-
-        public RewardPoint(int value, RewardType type)
-        {
-            Value = value;
-            Type = type;
-        }
+        public RewardPoint(int value, RewardType type) { Value = value; Type = type; }
     }
 
     [Serializable]
@@ -55,11 +43,8 @@ namespace Features.Tasks.Model
         public string Id;
         public string Name;
         public TaskType Type;
-        
         public Color TaskColor;
-        
         public bool IsFreeTime;
-
         public long StartTimeTicks;
         public long DurationTicks;
         
@@ -69,7 +54,6 @@ namespace Features.Tasks.Model
         public TimeSpan Duration;
         
         public TimeSpan EndTimeOfDay => StartTimeOfDay + Duration;
-
         public List<DayOfWeek> RecurrenceDays = new List<DayOfWeek>();
 
         public TaskData()
@@ -97,20 +81,36 @@ namespace Features.Tasks.Model
         public Guid Id { get; private set; }
         public TaskData Data { get; private set; }
         public TaskStatus TodayStatus { get; private set; }
+        public bool IsActionHandled { get; private set; }
 
         public Task(TaskData data)
         {
             Id = Guid.NewGuid();
             Data = data;
             TodayStatus = TaskStatus.Pending;
+            IsActionHandled = false;
         }
         
+        public void ApplyLoadedStatus(TaskStatus status)
+        {
+            TodayStatus = status;
+            if (status == TaskStatus.Completed || status == TaskStatus.Failed)
+            {
+                IsActionHandled = true;
+            }
+        }
+
+        public void SetActionHandled()
+        {
+            IsActionHandled = true;
+        }
+
         public void Start()
         {
-            if (TodayStatus != TaskStatus.Pending) return;
-            TodayStatus = TaskStatus.InProgress;
+            if (TodayStatus == TaskStatus.Pending)
+                TodayStatus = TaskStatus.InProgress;
         }
-        
+
         public void SetAwaitingConfirmation()
         {
             if (TodayStatus == TaskStatus.InProgress)
@@ -119,20 +119,14 @@ namespace Features.Tasks.Model
 
         public void Complete()
         {
-            if (TodayStatus != TaskStatus.InProgress) return;
-            TodayStatus = TaskStatus.Completed;
+            if (TodayStatus == TaskStatus.InProgress || TodayStatus == TaskStatus.AwaitingConfirmation)
+                TodayStatus = TaskStatus.Completed;
         }
 
         public void Fail()
         {
-            if (TodayStatus != TaskStatus.InProgress) return;
-            TodayStatus = TaskStatus.Failed;
+            if (TodayStatus == TaskStatus.Pending || TodayStatus == TaskStatus.InProgress || TodayStatus == TaskStatus.AwaitingConfirmation)
+                TodayStatus = TaskStatus.Failed;
         }
-
-        public void ResetStatus()
-        {
-            TodayStatus = TaskStatus.Pending;
-        }
-        
     }
 }

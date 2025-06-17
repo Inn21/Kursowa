@@ -16,7 +16,7 @@ namespace Core.Feature.PlayerStats
         [Inject] private readonly ISaveFeature _saveFeature;
 
         private PlayerStatsData _statsData;
-        private const string SAVE_KEY = "PlayerStatsData";
+        private const string SAVE_KEY = "PlayerStatsTEST2";
 
         public void Initialize()
         {

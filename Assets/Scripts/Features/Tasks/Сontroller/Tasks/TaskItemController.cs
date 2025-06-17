@@ -1,5 +1,4 @@
 using System.Collections;
-using Core.Feature.Tasks;
 using Features.Tasks.Model;
 using Features.Tasks.Сontroller.Global;
 using TMPro;
@@ -8,7 +7,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Zenject;
 
-namespace Features.Tasks.Сontroller.Tasks
+namespace Features.Tasks.Controller.Tasks
 {
     public class TaskItemController : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
@@ -43,6 +42,7 @@ namespace Features.Tasks.Сontroller.Tasks
         
         private ScrollRect _parentScrollRect;
         private bool _isDraggingHorizontally = false;
+        private bool _isDraggingVertically = false;
 
         private void Awake()
         {
@@ -53,12 +53,8 @@ namespace Features.Tasks.Сontroller.Tasks
         {
             _task = task;
             _ownerController = owner;
-
             _taskTitleText.text = _task.Data.Name;
-            
-            var startTime = _task.Data.StartTimeOfDay.ToString(@"hh\:mm");
-            var endTime = _task.Data.EndTimeOfDay.ToString(@"hh\:mm");
-            _timeText.text = $"{startTime} - {endTime}";
+            _timeText.text = $"{_task.Data.StartTimeOfDay:hh\\:mm} - {_task.Data.EndTimeOfDay:hh\\:mm}";
             
             var definition = _taskTypeFeature.GetDefinition(_task.Data.Type);
             if(definition != null && definition.Icon != null)
@@ -70,9 +66,7 @@ namespace Features.Tasks.Сontroller.Tasks
             bool isRealTask = !_task.Data.IsFreeTime;
             _editButton.gameObject.SetActive(isRealTask);
             if(isRealTask)
-            {
                  _editButton.onClick.AddListener(OnEditClicked);
-            }
             
             UpdateVisualState();
         }
@@ -91,9 +85,7 @@ namespace Features.Tasks.Сontroller.Tasks
         private void HandleTaskStateChange(Task changedTask)
         {
             if (_task != null && _task.Id == changedTask.Id)
-            {
                 UpdateVisualState();
-            }
         }
 
         private void UpdateVisualState()
@@ -109,21 +101,11 @@ namespace Features.Tasks.Сontroller.Tasks
 
             switch (_task.TodayStatus)
             {
-                case TaskStatus.Pending:
-                    _baseBackground.color = _defaultColor;
-                    break;
-                case TaskStatus.InProgress:
-                    _baseBackground.color = _inProgressColor;
-                    break;
-                case TaskStatus.AwaitingConfirmation:
-                    _baseBackground.color = _awaitingColor;
-                    break;
-                case TaskStatus.Completed:
-                    _baseBackground.color = _completedColor;
-                    break;
-                case TaskStatus.Failed:
-                    _baseBackground.color = _failedColor;
-                    break;
+                case TaskStatus.Pending: _baseBackground.color = _defaultColor; break;
+                case TaskStatus.InProgress: _baseBackground.color = _inProgressColor; break;
+                case TaskStatus.AwaitingConfirmation: _baseBackground.color = _awaitingColor; break;
+                case TaskStatus.Completed: _baseBackground.color = _completedColor; break;
+                case TaskStatus.Failed: _baseBackground.color = _failedColor; break;
             }
         }
         
@@ -134,11 +116,11 @@ namespace Features.Tasks.Сontroller.Tasks
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            if (!_canSwipe) return;
             if (_resetCoroutine != null) StopCoroutine(_resetCoroutine);
-
+            
             _originalPosition = _baseRect.anchoredPosition;
             _isDraggingHorizontally = false;
+            _isDraggingVertically = false;
             
             if(_parentScrollRect != null)
                 _parentScrollRect.OnBeginDrag(eventData);
@@ -146,50 +128,55 @@ namespace Features.Tasks.Сontroller.Tasks
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (!_canSwipe) return;
-
-            if (!_isDraggingHorizontally)
+            if(_isDraggingHorizontally)
             {
-                if (Mathf.Abs(eventData.delta.x) > Mathf.Abs(eventData.delta.y))
+                float deltaX = eventData.position.x - eventData.pressPosition.x;
+                _baseRect.anchoredPosition = new Vector2(_originalPosition.x + deltaX, _originalPosition.y);
+                return;
+            }
+            
+            if(_isDraggingVertically)
+            {
+                if(_parentScrollRect != null)
+                    _parentScrollRect.OnDrag(eventData);
+                return;
+            }
+            
+            if(Mathf.Abs(eventData.delta.x) > Mathf.Abs(eventData.delta.y))
+            {
+                if(_canSwipe)
                 {
                     _isDraggingHorizontally = true;
                     _rightSwipeVisual.SetActive(true);
                     _leftSwipeVisual.SetActive(true);
-                }
-                else
-                {
                     if(_parentScrollRect != null)
-                        _parentScrollRect.OnDrag(eventData);
-                    return;
+                        _parentScrollRect.enabled = false;
                 }
             }
-
-            if (_isDraggingHorizontally)
+            else
             {
-                float deltaX = eventData.position.x - eventData.pressPosition.x;
-                _baseRect.anchoredPosition = new Vector2(_originalPosition.x + deltaX, _originalPosition.y);
+                _isDraggingVertically = true;
+                 if(_parentScrollRect != null)
+                    _parentScrollRect.OnDrag(eventData);
             }
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            if (!_canSwipe) return;
-            
             if (_parentScrollRect != null)
+            {
                 _parentScrollRect.OnEndDrag(eventData);
+                _parentScrollRect.enabled = true;
+            }
             
             if(!_isDraggingHorizontally) return;
             
             float deltaX = _baseRect.anchoredPosition.x - _originalPosition.x;
 
             if (deltaX > _swipeThreshold)
-            {
                 _tasksFeature.CompleteTask(_task);
-            }
             else if (deltaX < -_swipeThreshold)
-            {
                 _tasksFeature.FailTask(_task);
-            }
             
             _resetCoroutine = StartCoroutine(ResetPositionCoroutine());
         }
